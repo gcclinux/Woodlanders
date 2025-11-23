@@ -16,10 +16,21 @@
   "player_profile_menu": {
     "title": "Profil Gracza",
     "player_name": "Nazwa Gracza",
+    "choose_character": "Wybierz Postać",
     "save_player": "Zapisz Gracza",
     "language": "Język",
     "menu_font": "Menu Czcionki",
     "back": "Wstecz"
+  },
+  "character_selection_dialog": {
+    "title": "Wybierz Swoją Postać",
+    "girl_red": "Dziewczyna (Czerwona)",
+    "girl_navy": "Dziewczyna (Granatowa)",
+    "boy_red": "Chłopiec (Czerwony)",
+    "boy_navy": "Chłopiec (Granatowy)",
+    "navigation_instruction": "Strzałki do nawigacji",
+    "confirm_instruction": "Enter aby potwierdzić",
+    "cancel_instruction": "ESC aby anulować"
   },
   "font_selection_dialog": {
     "title": "Wybierz Czcionkę Menu",

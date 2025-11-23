@@ -16,10 +16,21 @@
   "player_profile_menu": {
     "title": "Spelerprofiel",
     "player_name": "Spelersnaam",
+    "choose_character": "Kies Karakter",
     "save_player": "Speler Opslaan",
     "language": "Taal",
     "menu_font": "Lettertype Menu",
     "back": "Terug"
+  },
+  "character_selection_dialog": {
+    "title": "Selecteer Je Karakter",
+    "girl_red": "Meisje (Rood)",
+    "girl_navy": "Meisje (Marine)",
+    "boy_red": "Jongen (Rood)",
+    "boy_navy": "Jongen (Marine)",
+    "navigation_instruction": "Pijltjestoetsen om te navigeren",
+    "confirm_instruction": "Enter om te bevestigen",
+    "cancel_instruction": "ESC om te annuleren"
   },
   "font_selection_dialog": {
     "title": "Selecteer Menu Lettertype",

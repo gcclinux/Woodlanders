@@ -26,7 +26,7 @@ public class PlayerProfileMenu implements LanguageChangeListener, FontChangeList
     
     // Visual properties
     private static final float MENU_WIDTH = 400;
-    private static final float MENU_HEIGHT = 275;
+    private static final float MENU_HEIGHT = 310; // Increased to accommodate new option
     
     // Wooden plank background
     private Texture woodenPlank;
@@ -34,12 +34,18 @@ public class PlayerProfileMenu implements LanguageChangeListener, FontChangeList
     // Font for rendering
     private BitmapFont menuFont;
     
+    // Character selection dialog
+    private CharacterSelectionDialog characterSelectionDialog;
+    
     /**
      * Creates a new PlayerProfileMenu instance.
      */
     public PlayerProfileMenu() {
         woodenPlank = createWoodenPlank();
         createMenuFont();
+        
+        // Initialize character selection dialog
+        characterSelectionDialog = new CharacterSelectionDialog();
         
         // Register as language change listener
         LocalizationManager.getInstance().addLanguageChangeListener(this);
@@ -67,6 +73,7 @@ public class PlayerProfileMenu implements LanguageChangeListener, FontChangeList
         LocalizationManager loc = LocalizationManager.getInstance();
         menuOptions = new String[] {
             loc.getText("player_profile_menu.player_name"),
+            loc.getText("player_profile_menu.choose_character"),
             loc.getText("player_profile_menu.save_player"),
             loc.getText("player_profile_menu.language"),
             loc.getText("player_profile_menu.menu_font"),
@@ -130,6 +137,12 @@ public class PlayerProfileMenu implements LanguageChangeListener, FontChangeList
             return;
         }
         
+        // If character selection dialog is open, delegate to it
+        if (characterSelectionDialog.isOpen()) {
+            characterSelectionDialog.update();
+            return;
+        }
+        
         // Handle up/down navigation
         if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
             selectedIndex = (selectedIndex - 1 + menuOptions.length) % menuOptions.length;
@@ -138,8 +151,27 @@ public class PlayerProfileMenu implements LanguageChangeListener, FontChangeList
             selectedIndex = (selectedIndex + 1) % menuOptions.length;
         }
         
+        // Handle Enter key to select option
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+            handleMenuSelection();
+        }
+        
         // Handle escape - close menu (same as Back option)
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+            close();
+        }
+    }
+    
+    /**
+     * Handles menu option selection.
+     */
+    private void handleMenuSelection() {
+        // Index 1 is "Choose Character"
+        if (selectedIndex == 1) {
+            characterSelectionDialog.open();
+        }
+        // Index 5 is "Back"
+        else if (selectedIndex == 5) {
             close();
         }
     }
@@ -175,8 +207,8 @@ public class PlayerProfileMenu implements LanguageChangeListener, FontChangeList
         
         // Draw menu options
         for (int i = 0; i < menuOptions.length; i++) {
-            // Disable Save Player option if Free World is active
-            boolean isDisabled = (i == 1 && FreeWorldManager.isFreeWorldActive());
+            // Disable Save Player option if Free World is active (now at index 2)
+            boolean isDisabled = (i == 2 && FreeWorldManager.isFreeWorldActive());
             
             // Highlight selected option in yellow, disabled in gray
             if (isDisabled) {
@@ -193,6 +225,11 @@ public class PlayerProfileMenu implements LanguageChangeListener, FontChangeList
         }
         
         batch.end();
+        
+        // Render character selection dialog if open
+        if (characterSelectionDialog.isOpen()) {
+            characterSelectionDialog.render(batch, shapeRenderer, camX, camY);
+        }
     }
     
     /**
@@ -236,6 +273,11 @@ public class PlayerProfileMenu implements LanguageChangeListener, FontChangeList
             woodenPlank.dispose();
         }
         // Don't dispose menuFont - it's managed by FontManager
+        
+        // Dispose character selection dialog
+        if (characterSelectionDialog != null) {
+            characterSelectionDialog.dispose();
+        }
         
         // Unregister from language change listener
         LocalizationManager.getInstance().removeLanguageChangeListener(this);

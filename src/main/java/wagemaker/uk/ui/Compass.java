@@ -85,8 +85,8 @@ public class Compass {
      * @param viewport Viewport for screen dimension calculations
      */
     public void render(SpriteBatch batch, OrthographicCamera camera, Viewport viewport) {
-        // Skip rendering if textures failed to load
-        if (compassBackground == null || compassNeedle == null) {
+        // Skip rendering if textures failed to load or parameters are null
+        if (compassBackground == null || compassNeedle == null || camera == null || viewport == null) {
             return;
         }
         

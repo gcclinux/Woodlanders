@@ -141,6 +141,8 @@ For a comprehensive list of all game features, mechanics, and technical details,
 - �️ ***Dynamic Weather System** - Random rain events that follow the player (120s duration, 2-8 minute intervals)
 - 🧭 **Compass Navigation** - Always points toward spawn point for easy navigation
 - � **Worldp Save/Load System** - Save and load complete world states with separate singleplayer/multiplayer saves
+- 💧 **Water Puddles** - Puddles form during rain and evaporate after rain stops, adding environmental realism
+- 🦅 **Flying Birds** - Ambient bird formations fly across the screen in V-shape patterns from random boundaries
 
 #### Character & Movement
 - 🏃 **Animated Player Character** - Smooth walking animations with directional sprites
@@ -149,6 +151,7 @@ For a comprehensive list of all game features, mechanics, and technical details,
 - 🍌 **Banana Consumption** - Reduces 5% hunger when consumed (press number key to select, space to consume)
 - 📊 **Unified Health Bar** - Visual display showing both health (red) and hunger (blue) status
 - 🎯 **Precise Collision Detection** - Optimized hitboxes for all game objects
+- 👤 **Character Selection** - Choose from 4 character sprites (2 girls, 2 boys) with red or navy outfits; changes apply immediately after save
 
 #### Trees & Resources
 - 🌳 **Multiple Tree Types** - Small trees, regular trees, apple trees, banana trees, bamboo trees, and coconut trees
@@ -186,7 +189,7 @@ For a comprehensive list of all game features, mechanics, and technical details,
 - 🖥️ **HUD Elements** - Health bar, inventory display, compass, and connection status
 - 💾 **World Management** - Save, load, and manage multiple world saves
 - 🎨 **Custom Fonts** - Retro pixel font (slkscr.ttf) for authentic game feel
-- 🌍 **Multi-Language Support** - English, Polish (Polski), Portuguese (Português), and Dutch (Nederlands) with auto-detection
+- 🌍 **Multi-Language Support** - English, Polish (Polski), Portuguese (Português), German (Deutsch) and Dutch (Nederlands) with auto-detection
 
 ##  [Java Classes](docs/CLASSES.md)
 
@@ -211,6 +214,9 @@ For a comprehensive list of all game features, mechanics, and technical details,
 - **Collision System**: Precise hitboxes for all entities with optimized detection
 - **Planting System**: Plant baby bamboo on sand tiles with growth and transformation mechanics
 - **Targeting System**: Visual tile-based targeting with WASD movement and persistent indicator while item selected
+- **Weather System**: Dynamic rain with water puddles that form during rain and evaporate after rain stops
+- **Flying Birds**: Ambient bird formations in V-shape patterns flying across the screen from random boundaries
+- **Character Selection**: Choose from 4 character sprites with immediate visual update after save 
 
 ### 🚧 Future Enhancements
 - **Crafting System**: Combine resources to create new items
@@ -239,6 +245,9 @@ Resource respawn behavior is configured with hardcoded values in the `RespawnCon
 - **Default respawn time**: 15 minutes (900,000 ms)
 - **Visual indicator threshold**: 1 minute (60,000 ms) before respawn
 - **Visual indicators**: Enabled by default
+- **Weather System**: Rain events occur randomly every 2-8 minutes, lasting 120 seconds with water puddles
+- **Flying Birds**: Bird formations spawn at random intervals (30-90 seconds) and fly across the screen in V-shape patterns
+- **Plant Growth**: Baby bamboo grows into harvestable bamboo trees after 120 seconds when planted on sand tiles
 
 To customize respawn durations, modify the constants in `src/main/java/wagemaker/uk/respawn/RespawnConfig.java` and recompile the game.
 

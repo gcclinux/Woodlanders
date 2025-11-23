@@ -38,8 +38,6 @@ public class HealthHungerIntegrationTest {
     
     @BeforeEach
     public void setUp() {
-        // Skip tests that require texture loading in headless environment
-        assumeTrue(Gdx.gl != null, "Skipping test - requires graphics context");
         
         camera = new OrthographicCamera();
         player = new Player(0, 0, camera);
@@ -178,6 +176,7 @@ public class HealthHungerIntegrationTest {
     @Test
     @Order(6)
     public void testAppleDoesNotAffectHunger() {
+        
         // Set player hunger to 50%
         player.setHunger(50);
         player.setHealth(50);
@@ -200,6 +199,7 @@ public class HealthHungerIntegrationTest {
     @Test
     @Order(7)
     public void testAppleRemovedFromInventory() {
+        
         // Add multiple apples
         inventoryManager.getCurrentInventory().addApple(3);
         inventoryManager.setSelectedSlot(0);
@@ -221,6 +221,7 @@ public class HealthHungerIntegrationTest {
     @Test
     @Order(8)
     public void testAppleHealthCapsAt100() {
+        
         // Set player health to 95%
         player.setHealth(95);
         
@@ -241,6 +242,7 @@ public class HealthHungerIntegrationTest {
     @Test
     @Order(9)
     public void testCannotConsumeAppleWithoutInventory() {
+        
         // No apples in inventory
         player.setHealth(50);
         inventoryManager.setSelectedSlot(0);
@@ -261,6 +263,7 @@ public class HealthHungerIntegrationTest {
     @Test
     @Order(10)
     public void testBananaReducesHunger() {
+        
         // Set player hunger to 50%
         player.setHunger(50);
         
@@ -284,6 +287,7 @@ public class HealthHungerIntegrationTest {
     @Test
     @Order(11)
     public void testBananaDoesNotAffectHealth() {
+        
         // Set player health to 50%
         player.setHealth(50);
         player.setHunger(50);
@@ -306,6 +310,7 @@ public class HealthHungerIntegrationTest {
     @Test
     @Order(12)
     public void testBananaRemovedFromInventory() {
+        
         // Add multiple bananas
         inventoryManager.getCurrentInventory().addBanana(3);
         inventoryManager.setSelectedSlot(1);
@@ -327,6 +332,7 @@ public class HealthHungerIntegrationTest {
     @Test
     @Order(13)
     public void testBananaHungerFloorsAt0() {
+        
         // Set player hunger to 3%
         player.setHunger(3);
         
@@ -347,6 +353,7 @@ public class HealthHungerIntegrationTest {
     @Test
     @Order(14)
     public void testCannotConsumeBananaWithoutInventory() {
+        
         // No bananas in inventory
         player.setHunger(50);
         inventoryManager.setSelectedSlot(1);

@@ -16,10 +16,21 @@
   "player_profile_menu": {
     "title": "Spielerprofil",
     "player_name": "Spielername",
+    "choose_character": "Charakter Wählen",
     "save_player": "Spieler speichern",
     "language": "Sprache",
     "menu_font": "Schriftart-Menü",
     "back": "Zurück"
+  },
+  "character_selection_dialog": {
+    "title": "Wähle Deinen Charakter",
+    "girl_red": "Mädchen (Rot)",
+    "girl_navy": "Mädchen (Marine)",
+    "boy_red": "Junge (Rot)",
+    "boy_navy": "Junge (Marine)",
+    "navigation_instruction": "Pfeiltasten zum Navigieren",
+    "confirm_instruction": "Enter zum Bestätigen",
+    "cancel_instruction": "ESC zum Abbrechen"
   },
   "font_selection_dialog": {
     "title": "Menüschriftart wählen",

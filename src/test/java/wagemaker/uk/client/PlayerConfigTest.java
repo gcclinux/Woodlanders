@@ -227,4 +227,82 @@ public class PlayerConfigTest {
         assertNull(loadedConfig.getCompassTargetY(), 
                    "Compass target Y should be null when not set");
     }
+    
+    @Test
+    public void testGetSelectedCharacterReturnsCorrectValue() {
+        // Test that getSelectedCharacter() returns the saved character filename
+        PlayerConfig config = PlayerConfig.load();
+        config.saveSelectedCharacter("girl_red_start.png");
+        
+        // Load and verify
+        PlayerConfig loadedConfig = PlayerConfig.load();
+        assertEquals("girl_red_start.png", loadedConfig.getSelectedCharacter(),
+                     "getSelectedCharacter() should return the saved character filename");
+    }
+    
+    @Test
+    public void testSaveSelectedCharacterWritesToJsonCorrectly() {
+        // Test that saveSelectedCharacter() persists to JSON
+        PlayerConfig config = PlayerConfig.load();
+        config.saveSelectedCharacter("boy_red_start.png");
+        
+        // Load a fresh config and verify it was persisted
+        PlayerConfig loadedConfig = PlayerConfig.load();
+        assertEquals("boy_red_start.png", loadedConfig.getSelectedCharacter(),
+                     "Character selection should be persisted to JSON");
+    }
+    
+    @Test
+    public void testDefaultValueWhenConfigIsEmpty() {
+        // Test that default value "boy_navy_start.png" is returned when no character is saved
+        PlayerConfig config = PlayerConfig.load();
+        
+        // Don't save any character, just load
+        String defaultCharacter = config.getSelectedCharacter();
+        assertEquals("boy_navy_start.png", defaultCharacter,
+                     "Default character should be boy_navy_start.png when config is empty");
+    }
+    
+    @Test
+    public void testErrorHandlingForCorruptedConfig() throws IOException {
+        // Ensure config directory exists
+        if (!testConfigDir.exists()) {
+            testConfigDir.mkdirs();
+        }
+        
+        // Create a completely corrupted JSON file (not valid JSON at all)
+        try (FileWriter writer = new FileWriter(testConfigFile)) {
+            writer.write("This is not JSON at all\n");
+            writer.write("{ broken\n");
+        }
+        
+        // Test that loading corrupted file returns default character without throwing
+        PlayerConfig config = PlayerConfig.load();
+        assertNotNull(config, "Config should not be null even with corrupted file");
+        assertEquals("boy_navy_start.png", config.getSelectedCharacter(),
+                     "Default character should be returned for corrupted config");
+    }
+    
+    @Test
+    public void testCharacterSelectionWithOtherFields() {
+        // Clean up first to ensure fresh state
+        deleteConfigFile();
+        
+        // Test that character selection can coexist with other config fields
+        PlayerConfig config = PlayerConfig.load();
+        config.saveLastServer("192.168.1.100:25565");
+        config.saveCompassTarget(100.0f, 200.0f);
+        config.saveSelectedCharacter("girl_navy_start.png");
+        
+        // Load and verify all fields are preserved
+        PlayerConfig loadedConfig = PlayerConfig.load();
+        assertEquals("192.168.1.100:25565", loadedConfig.getLastServer(),
+                     "Server address should be preserved");
+        assertEquals(100.0f, loadedConfig.getCompassTargetX(), 0.001f,
+                     "Compass target X should be preserved");
+        assertEquals(200.0f, loadedConfig.getCompassTargetY(), 0.001f,
+                     "Compass target Y should be preserved");
+        assertEquals("girl_navy_start.png", loadedConfig.getSelectedCharacter(),
+                     "Character selection should be preserved");
+    }
 }

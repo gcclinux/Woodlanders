@@ -33,6 +33,7 @@ import wagemaker.uk.targeting.TargetIndicatorRenderer;
 import wagemaker.uk.targeting.TargetingMode;
 import wagemaker.uk.targeting.TargetingCallback;
 import wagemaker.uk.targeting.PlantingTargetValidator;
+import wagemaker.uk.client.PlayerConfig;
 import java.util.Map;
 import java.util.Random;
 
@@ -506,9 +507,49 @@ public class Player {
         updateCamera();
     }
 
+    /**
+     * Reloads the player character sprite based on the current PlayerConfig selection.
+     * This can be called at runtime to change the player's appearance.
+     * Disposes the old sprite sheet before loading the new one.
+     */
+    public void reloadCharacter() {
+        // Dispose old sprite sheet if it exists
+        if (spriteSheet != null) {
+            spriteSheet.dispose();
+            System.out.println("Disposed old character sprite");
+        }
+        
+        // Reload animations with new character
+        loadAnimations();
+        System.out.println("Character sprite reloaded successfully");
+    }
+    
     private void loadAnimations() {
-        // Load the sprite sheet
-        spriteSheet = new Texture("sprites/player/boy_navy_start.png");
+        // Load PlayerConfig to get selected character
+        PlayerConfig config = PlayerConfig.load();
+        String characterFilename = config.getSelectedCharacter();
+        
+        // Use default if config is empty or invalid
+        if (characterFilename == null || characterFilename.isEmpty()) {
+            characterFilename = "boy_navy_start.png";
+            System.out.println("No character selected in config, using default: " + characterFilename);
+        }
+        
+        // Load the sprite sheet with error handling
+        try {
+            spriteSheet = new Texture("sprites/player/" + characterFilename);
+            System.out.println("Loaded character sprite: " + characterFilename);
+        } catch (Exception e) {
+            System.err.println("Error loading character sprite '" + characterFilename + "': " + e.getMessage());
+            System.err.println("Falling back to default character: boy_navy_start.png");
+            characterFilename = "boy_navy_start.png";
+            try {
+                spriteSheet = new Texture("sprites/player/" + characterFilename);
+            } catch (Exception fallbackError) {
+                System.err.println("CRITICAL: Could not load default character sprite: " + fallbackError.getMessage());
+                throw new RuntimeException("Failed to load player sprite", fallbackError);
+            }
+        }
         
         // Get sprite sheet dimensions
         // int spriteSheetHeight = spriteSheet.getHeight();
@@ -1613,6 +1654,12 @@ public class Player {
      * @param deltaTime Time elapsed since last frame in seconds
      */
     private void updateHunger(float deltaTime) {
+        // Check for hunger death first (handles cases where hunger was set to 100 externally)
+        if (hunger >= 100) {
+            handleHungerDeath();
+            return; // Exit early after respawn
+        }
+        
         // Accumulate time
         hungerTimer += deltaTime;
         

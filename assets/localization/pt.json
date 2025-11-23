@@ -16,10 +16,21 @@
   "player_profile_menu": {
     "title": "Perfil do Jogador",
     "player_name": "Nome do Jogador",
+    "choose_character": "Escolher Personagem",
     "save_player": "Salvar Jogador",
     "language": "Idioma",
     "menu_font": "Menu de Fonte",
     "back": "Voltar"
+  },
+  "character_selection_dialog": {
+    "title": "Selecione Seu Personagem",
+    "girl_red": "Menina (Vermelha)",
+    "girl_navy": "Menina (Marinha)",
+    "boy_red": "Menino (Vermelho)",
+    "boy_navy": "Menino (Marinho)",
+    "navigation_instruction": "Setas para navegar",
+    "confirm_instruction": "Enter para confirmar",
+    "cancel_instruction": "ESC para cancelar"
   },
   "font_selection_dialog": {
     "title": "Selecionar Fonte do Menu",

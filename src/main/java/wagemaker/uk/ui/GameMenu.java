@@ -57,6 +57,9 @@ public class GameMenu implements LanguageChangeListener, FontChangeListener {
     // Player profile menu
     private PlayerProfileMenu playerProfileMenu;
     
+    // Pending character selection (set by CharacterSelectionDialog, saved by savePlayerPosition)
+    private static String pendingCharacterSelection = null;
+    
     // World save/load components
     private WorldSaveDialog worldSaveDialog;
     private WorldLoadDialog worldLoadDialog;
@@ -391,6 +394,19 @@ public class GameMenu implements LanguageChangeListener, FontChangeListener {
             } catch (Exception e) {
                 // No font saved or error parsing, use default
                 System.out.println("No saved font found, using default");
+            }
+            
+            // Load selected character
+            try {
+                String savedCharacter = parseJsonString(jsonContent, "\"selectedCharacter\":");
+                if (savedCharacter != null && !savedCharacter.isEmpty()) {
+                    PlayerConfig playerConfig = PlayerConfig.load();
+                    playerConfig.setSelectedCharacter(savedCharacter);
+                    System.out.println("Selected character loaded: " + savedCharacter);
+                }
+            } catch (Exception e) {
+                // No character saved or error parsing, use default
+                System.out.println("No saved character found, using default");
             }
             
             // Set player position, health, and hunger
@@ -1460,20 +1476,23 @@ public class GameMenu implements LanguageChangeListener, FontChangeListener {
             playerProfileMenu.close();
             nameDialogFromProfile = true; // Track that we came from player profile
             openNameDialog();
-        } else if (selectedIndex == 1) { // Save Player
+        } else if (selectedIndex == 1) { // Choose Character
+            // Character selection is handled by PlayerProfileMenu itself
+            // Do nothing here - the dialog opens from PlayerProfileMenu.handleMenuSelection()
+        } else if (selectedIndex == 2) { // Save Player
             if (!FreeWorldManager.isFreeWorldActive()) {
                 savePlayerPosition();
                 showSaveNotification = true;
                 saveNotificationTimer = SAVE_NOTIFICATION_DURATION;
             }
             // Stay in Player Profile menu
-        } else if (selectedIndex == 2) { // Language
+        } else if (selectedIndex == 3) { // Language
             playerProfileMenu.close();
             openLanguageDialog();
-        } else if (selectedIndex == 3) { // Menu Font
+        } else if (selectedIndex == 4) { // Menu Font
             playerProfileMenu.close();
             openFontSelectionDialog();
-        } else if (selectedIndex == 4) { // Back
+        } else if (selectedIndex == 5) { // Back
             playerProfileMenu.close();
             isOpen = true; // Return to main menu
         }
@@ -1699,6 +1718,19 @@ public class GameMenu implements LanguageChangeListener, FontChangeListener {
             String currentFont = FontManager.getInstance().getCurrentFontType().getDisplayName();
             jsonBuilder.append(String.format("  \"fontName\": \"%s\",\n", currentFont));
             
+            // Include selected character (use pending selection if available, otherwise load from config)
+            String selectedCharacter;
+            boolean characterWasChanged = false;
+            if (pendingCharacterSelection != null) {
+                selectedCharacter = pendingCharacterSelection;
+                characterWasChanged = true;
+                System.out.println("Saving pending character selection: " + selectedCharacter);
+            } else {
+                PlayerConfig playerConfig = PlayerConfig.load();
+                selectedCharacter = playerConfig.getSelectedCharacter();
+            }
+            jsonBuilder.append(String.format("  \"selectedCharacter\": \"%s\",\n", selectedCharacter));
+            
             jsonBuilder.append(String.format("  \"savedAt\": \"%s\"\n", new java.util.Date().toString()));
             jsonBuilder.append("}");
             
@@ -1713,9 +1745,17 @@ public class GameMenu implements LanguageChangeListener, FontChangeListener {
             System.out.println("Player hunger saved: " + player.getHunger());
             System.out.println("Player name saved: " + playerName);
             System.out.println("Font saved: " + FontManager.getInstance().getCurrentFontType().getDisplayName());
+            System.out.println("Character saved: " + selectedCharacter);
             System.out.println("Mode: " + (isMultiplayer ? "Multiplayer" : "Singleplayer"));
             if (lastServer != null) {
                 System.out.println("Last server preserved: " + lastServer);
+            }
+            
+            // If a character was just selected, reload the player sprite immediately
+            if (characterWasChanged) {
+                System.out.println("Reloading player character sprite to apply changes...");
+                player.reloadCharacter();
+                clearPendingCharacterSelection(); // Clear after reloading
             }
             
         } catch (IOException e) {
@@ -1960,5 +2000,33 @@ public class GameMenu implements LanguageChangeListener, FontChangeListener {
         
         // Unregister from language change listener
         LocalizationManager.getInstance().removeLanguageChangeListener(this);
+    }
+    
+    /**
+     * Sets the pending character selection.
+     * Called by CharacterSelectionDialog when a character is selected.
+     * The selection will be saved when savePlayerPosition() is called.
+     * 
+     * @param characterFilename The character sprite filename
+     */
+    public static void setPendingCharacterSelection(String characterFilename) {
+        pendingCharacterSelection = characterFilename;
+        System.out.println("Pending character selection set to: " + characterFilename);
+    }
+    
+    /**
+     * Gets the pending character selection, or null if none is pending.
+     * 
+     * @return The pending character filename, or null
+     */
+    public static String getPendingCharacterSelection() {
+        return pendingCharacterSelection;
+    }
+    
+    /**
+     * Clears the pending character selection after it has been saved.
+     */
+    private static void clearPendingCharacterSelection() {
+        pendingCharacterSelection = null;
     }
 }

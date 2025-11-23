@@ -17,6 +17,7 @@ public class PlayerConfig {
     private Float compassTargetY;
     private String language;
     private String fontName;
+    private String selectedCharacter;
     
     /**
      * Private constructor. Use load() to create instances.
@@ -27,6 +28,7 @@ public class PlayerConfig {
         this.compassTargetY = null;
         this.language = null;
         this.fontName = null;
+        this.selectedCharacter = null;
     }
     
     /**
@@ -103,6 +105,9 @@ public class PlayerConfig {
             // Parse the fontName field
             config.fontName = parseJsonString(jsonContent, "\"fontName\":");
             
+            // Parse the selectedCharacter field
+            config.selectedCharacter = parseJsonString(jsonContent, "\"selectedCharacter\":");
+            
             // Parse the compassTarget fields
             String compassTargetXStr = parseJsonNumber(jsonContent, "\"compassTarget\":", "\"x\":");
             String compassTargetYStr = parseJsonNumber(jsonContent, "\"compassTarget\":", "\"y\":");
@@ -135,6 +140,9 @@ public class PlayerConfig {
             }
             if (config.fontName != null) {
                 System.out.println("Font: " + config.fontName);
+            }
+            if (config.selectedCharacter != null) {
+                System.out.println("Selected character: " + config.selectedCharacter);
             }
             
         } catch (IOException e) {
@@ -317,6 +325,15 @@ public class PlayerConfig {
                 // Update or add the lastServer field
                 jsonContent = updateJsonField(existingContent, "lastServer", lastServer);
                 
+                // Update or add the language field
+                jsonContent = updateJsonField(jsonContent, "language", language);
+                
+                // Update or add the fontName field
+                jsonContent = updateJsonField(jsonContent, "fontName", fontName);
+                
+                // Update or add the selectedCharacter field
+                jsonContent = updateJsonField(jsonContent, "selectedCharacter", selectedCharacter);
+                
                 // Update or add the compassTarget object
                 jsonContent = updateCompassTargetField(jsonContent);
             } else {
@@ -369,6 +386,14 @@ public class PlayerConfig {
                 json.append(",\n");
             }
             json.append("  \"fontName\": \"").append(fontName).append("\"");
+            hasFields = true;
+        }
+        
+        if (selectedCharacter != null && !selectedCharacter.isEmpty()) {
+            if (hasFields) {
+                json.append(",\n");
+            }
+            json.append("  \"selectedCharacter\": \"").append(selectedCharacter).append("\"");
             hasFields = true;
         }
         
@@ -603,6 +628,43 @@ public class PlayerConfig {
             System.out.println("Saved font preference: " + fontName);
         } catch (Exception e) {
             System.err.println("Unexpected error saving font preference: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Retrieves the saved selected character sprite filename.
+     * 
+     * @return The character sprite filename, or "boy_navy_start.png" if not set
+     */
+    public String getSelectedCharacter() {
+        if (selectedCharacter == null || selectedCharacter.isEmpty()) {
+            return "boy_navy_start.png";
+        }
+        return selectedCharacter;
+    }
+    
+    /**
+     * Sets the selected character sprite filename without persisting to disk.
+     * Use this to update the selection in memory. Call save() separately to persist.
+     * 
+     * @param filename The character sprite filename to set
+     */
+    public void setSelectedCharacter(String filename) {
+        this.selectedCharacter = filename;
+    }
+    
+    /**
+     * Saves the selected character sprite filename and persists it to disk.
+     * 
+     * @param filename The character sprite filename to save
+     */
+    public void saveSelectedCharacter(String filename) {
+        try {
+            this.selectedCharacter = filename;
+            save();
+            System.out.println("Saved selected character: " + filename);
+        } catch (Exception e) {
+            System.err.println("Unexpected error saving selected character: " + e.getMessage());
         }
     }
     
