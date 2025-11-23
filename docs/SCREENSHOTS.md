@@ -2,10 +2,13 @@ SOme screenshots are older the idea is to start adding them based on their versi
 
 <div align="center">
 
+### Initial Character selection idea
+![Latest 0.0.21](../www/images/Character-selection-birds-rain-puddle.png)
+*Initial charcter selection design idea allowing player to select different characters*
+
 ### Free World Play
 ![Latest 0.0.20](../screenshots/free_world_play.png)
 *The Free World gives player the opportunity to explore and be creative with plenty of resources*
-
 
 ### Player Location Compass
 ![Latest 0.0.18](../www/images/health-hunger.png)

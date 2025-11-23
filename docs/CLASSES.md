@@ -47,14 +47,16 @@ Complete reference of all Java classes in the Woodlanders project, organized by 
 
 | Class | Purpose |
 |-------|---------|
-| **Inventory** | 5-slot inventory data structure |
+| **Inventory** | 6-slot inventory data structure |
 | **InventoryManager** | Inventory operations and auto-consumption |
 | **ItemType** | Item type enumeration |
 | **Apple** | Consumable apple item |
 | **Banana** | Consumable banana item |
 | **BabyBamboo** | Plantable baby bamboo item |
+| **BabyTree** | Plantable baby tree item |
 | **BambooStack** | Resource bamboo stack item |
 | **WoodStack** | Resource wood stack item |
+| **PalmFiber** | Resource palm fiber item |
 | **Pebble** | Resource pebble item |
 
 ## Planting System (wagemaker.uk.planting)
@@ -63,6 +65,7 @@ Complete reference of all Java classes in the Woodlanders project, organized by 
 |-------|---------|
 | **PlantingSystem** | Core planting logic and validation |
 | **PlantedBamboo** | Planted bamboo entity with growth timer |
+| **PlantedTree** | Planted tree entity with growth timer |
 
 ## Targeting System (wagemaker.uk.targeting)
 
@@ -97,7 +100,9 @@ Complete reference of all Java classes in the Woodlanders project, organized by 
 | **ItemState** | Network item data structure |
 | **StoneState** | Network stone data structure |
 | **PlantedBambooState** | Network planted bamboo data structure |
+| **PlantedTreeState** | Network planted tree data structure |
 | **WorldState** | Complete world state structure |
+| **WorldStateUpdate** | Incremental world state updates |
 
 ### Network Message Types
 | Class | Purpose |
@@ -106,13 +111,18 @@ Complete reference of all Java classes in the Woodlanders project, organized by 
 | **PlayerJoinMessage** | Player joining the game |
 | **PlayerLeaveMessage** | Player leaving the game |
 | **PlayerHealthUpdateMessage** | Player health changes |
+| **PlayerHungerUpdateMessage** | Player hunger changes |
+| **PlayerRespawnMessage** | Player respawn event |
 | **AttackActionMessage** | Attack on trees/stones/players |
 | **ItemPickupMessage** | Item pickup confirmation |
 | **ItemSpawnMessage** | Item spawning in world |
+| **ItemConsumptionMessage** | Item consumption event |
 | **TreeHealthUpdateMessage** | Tree health changes |
 | **TreeDestroyedMessage** | Tree destruction |
 | **TreeCreatedMessage** | Tree creation |
 | **TreeRemovalMessage** | Ghost tree removal |
+| **TreePlantMessage** | Tree planting action |
+| **TreeTransformMessage** | Planted tree transformation |
 | **StoneHealthUpdateMessage** | Stone health changes |
 | **StoneDestroyedMessage** | Stone destruction |
 | **StoneCreatedMessage** | Stone creation |
@@ -130,6 +140,7 @@ Complete reference of all Java classes in the Woodlanders project, organized by 
 | **WorldStateUpdateMessage** | Incremental world state updates |
 | **ResourceRespawnMessage** | Resource respawn event |
 | **RespawnStateMessage** | Respawn state synchronization |
+| **FreeWorldActivationMessage** | Free World mode activation |
 
 ### Network Enums
 | Class | Purpose |
@@ -157,6 +168,11 @@ Complete reference of all Java classes in the Woodlanders project, organized by 
 | **RainZone** | Individual rain zone |
 | **RainParticle** | Rain particle entity |
 | **RainConfig** | Rain configuration |
+| **PuddleManager** | Water puddle management |
+| **PuddleRenderer** | Water puddle rendering |
+| **PuddleState** | Puddle state tracking |
+| **PuddleConfig** | Puddle configuration |
+| **WaterPuddle** | Individual water puddle entity |
 
 ## Resource Respawn System (wagemaker.uk.respawn)
 
@@ -180,16 +196,25 @@ Complete reference of all Java classes in the Woodlanders project, organized by 
 |-------|---------|
 | **GameMenu** | Main in-game menu system |
 | **MultiplayerMenu** | Multiplayer connection options |
+| **PlayerProfileMenu** | Player profile and customization |
 | **ConnectDialog** | Server connection dialog |
 | **ServerHostDialog** | Server hosting dialog |
 | **WorldSaveDialog** | World save dialog |
 | **WorldLoadDialog** | World load dialog |
 | **WorldManageDialog** | World management dialog |
 | **LanguageDialog** | Language selection dialog |
+| **FontSelectionDialog** | Font selection dialog |
+| **CharacterSelectionDialog** | Character sprite selection dialog |
+| **ControlsDialog** | Game controls display dialog |
+| **PlayerLocationDialog** | Player location information dialog |
 | **ErrorDialog** | Error message dialog |
 | **Compass** | Navigation compass UI |
+| **HealthBarUI** | Health and hunger bar display |
 | **InventoryRenderer** | Inventory display |
 | **ConnectionQualityIndicator** | Network status display |
+| **FontManager** | Font loading and management |
+| **FontChangeListener** | Font change notifications |
+| **FontType** | Enum for font types |
 
 ## Localization (wagemaker.uk.localization)
 
@@ -204,6 +229,22 @@ Complete reference of all Java classes in the Woodlanders project, organized by 
 |-------|---------|
 | **PlayerConfig** | Player configuration management |
 
+## Birds System (wagemaker.uk.birds)
+
+| Class | Purpose |
+|-------|---------|
+| **Bird** | Individual bird entity with flight behavior |
+| **BirdFormation** | V-shape bird formation |
+| **BirdFormationManager** | Manages bird formation spawning and lifecycle |
+| **SpawnBoundary** | Enum for spawn boundaries (TOP, BOTTOM, LEFT, RIGHT) |
+| **SpawnPoint** | Bird spawn point data structure |
+
+## Free World System (wagemaker.uk.freeworld)
+
+| Class | Purpose |
+|-------|---------|
+| **FreeWorldManager** | Manages Free World mode activation and item grants |
+
 ## Server (wagemaker.uk.server)
 
 | Class | Purpose |
@@ -215,12 +256,12 @@ Complete reference of all Java classes in the Woodlanders project, organized by 
 
 ## Class Count Summary
 
-- **Total Classes**: 120+
-- **Network Messages**: 25+
-- **UI Components**: 12
+- **Total Classes**: 145+
+- **Network Messages**: 33+
+- **UI Components**: 20
 - **Tree Types**: 6
-- **Item Types**: 6
-- **Game Systems**: 8 major systems
+- **Item Types**: 8
+- **Game Systems**: 11 major systems
 
 ## Key Architectural Patterns
 

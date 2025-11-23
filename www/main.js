@@ -99,6 +99,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (nextBtn) nextBtn.addEventListener('click', () => goToSlide(currentSlide + 1));
 
         // Auto-advance carousel
-        setInterval(() => goToSlide(currentSlide + 1), 6000);
+        setInterval(() => goToSlide(currentSlide + 1), 10000);
     }
 });
