@@ -85,7 +85,15 @@ function Download-JRE {
         if (Test-Path $tempExtract) {
             Remove-Item $tempExtract -Recurse -Force
         }
-        Expand-Archive -Path $jreZip -DestinationPath $tempExtract -Force
+        
+        # Try Expand-Archive first, fallback to .NET if module not available
+        try {
+            Expand-Archive -Path $jreZip -DestinationPath $tempExtract -Force -ErrorAction Stop
+        } catch {
+            Write-Status "Using fallback extraction method..."
+            Add-Type -AssemblyName System.IO.Compression.FileSystem
+            [System.IO.Compression.ZipFile]::ExtractToDirectory($jreZip, $tempExtract)
+        }
         
         # Find the extracted JDK directory (usually has a version number)
         $extractedDir = Get-ChildItem -Path $tempExtract -Directory | Select-Object -First 1
@@ -112,7 +120,15 @@ function Install-Application {
     New-Item -ItemType Directory -Force -Path $INSTALL_DIR | Out-Null
     
     # Copy application files
-    $scriptDir = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Path }
+    # When compiled with ps2exe, use the directory where the EXE is located
+    if ($PSScriptRoot) {
+        $scriptDir = $PSScriptRoot
+    } elseif ($MyInvocation.MyCommand.Path) {
+        $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+    } else {
+        # Fallback for ps2exe compiled EXE - use current directory
+        $scriptDir = [System.IO.Path]::GetDirectoryName([System.Diagnostics.Process]::GetCurrentProcess().MainModule.FileName)
+    }
     
     if (Test-Path "$scriptDir\woodlanders-launcher.jar") {
         Copy-Item "$scriptDir\woodlanders-launcher.jar" -Destination $INSTALL_DIR -Force

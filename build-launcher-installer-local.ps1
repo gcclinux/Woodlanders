@@ -47,9 +47,9 @@ Write-Host ""
 # Step 4: Create installer script
 Write-Host "[4/7] Creating installer script..." -ForegroundColor Yellow
 
-# Read the template from the original location or create it
+# Read the template from the GitHub scripts location
 $installerScriptPath = "installer-staging\install.ps1"
-$installerContent = Get-Content -Path "C:\Users\ricardo\Programming\woodlanders-launcher\app\src\main\scripts\windows-installer.ps1" -Raw -ErrorAction SilentlyContinue
+$installerContent = Get-Content -Path ".github\scripts\windows-installer-template.ps1" -Raw -ErrorAction SilentlyContinue
 
 if ($installerContent) {
     # Use the existing script as template and patch it for ps2exe compatibility
@@ -61,7 +61,7 @@ if ($installerContent) {
     $installerContent = $installerContent -replace '\$scriptDir = if \(\$PSScriptRoot\) \{ \$PSScriptRoot \} else \{ Split-Path -Parent \$MyInvocation\.MyCommand\.Path \}', '$scriptDir = if ($PSScriptRoot) { $PSScriptRoot } elseif ($MyInvocation.MyCommand.Path) { Split-Path -Parent $MyInvocation.MyCommand.Path } else { Get-Location | Select-Object -ExpandProperty Path }'
     
     $installerContent | Out-File -FilePath $installerScriptPath -Encoding UTF8
-    Write-Host "Installer script created from template (patched for EXE)" -ForegroundColor Green
+    Write-Host "Installer script created from GitHub template (patched for EXE)" -ForegroundColor Green
 } else {
     # Create a new installer script
     Write-Host "Creating new installer script..." -ForegroundColor Gray
@@ -109,7 +109,16 @@ function Download-JRE {
         Write-Status "Extracting JDK..."
         $tempExtract = "$env:TEMP\woodlanders-jre-extract"
         if (Test-Path $tempExtract) { Remove-Item $tempExtract -Recurse -Force }
-        Expand-Archive -Path $jreZip -DestinationPath $tempExtract -Force
+        
+        # Try Expand-Archive first, fallback to .NET if module not available
+        try {
+            Expand-Archive -Path $jreZip -DestinationPath $tempExtract -Force -ErrorAction Stop
+        } catch {
+            Write-Status "Using fallback extraction method..."
+            Add-Type -AssemblyName System.IO.Compression.FileSystem
+            [System.IO.Compression.ZipFile]::ExtractToDirectory($jreZip, $tempExtract)
+        }
+        
         $extractedDir = Get-ChildItem -Path $tempExtract -Directory | Select-Object -First 1
         Get-ChildItem -Path $extractedDir.FullName | Move-Item -Destination $JRE_DIR -Force
         Remove-Item $tempExtract -Recurse -Force
@@ -333,7 +342,14 @@ if ($test -ne 'n' -and $test -ne 'N') {
     Write-Host "Extracting ZIP..." -ForegroundColor Cyan
     $testDir = "build\distributions\test-installer"
     if (Test-Path $testDir) { Remove-Item $testDir -Recurse -Force }
-    Expand-Archive -Path build\distributions\woodlanders-launcher-installer.zip -DestinationPath $testDir
+    
+    # Try Expand-Archive first, fallback to .NET if module not available
+    try {
+        Expand-Archive -Path build\distributions\woodlanders-launcher-installer.zip -DestinationPath $testDir -ErrorAction Stop
+    } catch {
+        Add-Type -AssemblyName System.IO.Compression.FileSystem
+        [System.IO.Compression.ZipFile]::ExtractToDirectory("$PWD\build\distributions\woodlanders-launcher-installer.zip", "$PWD\$testDir")
+    }
     Write-Host "Launching installer..." -ForegroundColor Cyan
     Start-Process -FilePath "$testDir\woodlanders-setup-launcher.exe" -WorkingDirectory $testDir -Wait
 }
