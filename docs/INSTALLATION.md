@@ -95,3 +95,14 @@ java -Xms2G -Xmx2G -jar build/libs/woodlanders-server.jar
 # All options combined
 java -Xms4G -Xmx4G -jar build/libs/woodlanders-server.jar --port 25565 --config server.properties
 ```
+
+### Windows launcher cleanup
+```
+PowerShell 7.5.4
+PS C:\Windows\System32> Remove-Item -Path "$env:LOCALAPPDATA\Woodlanders\Launcher" -Recurse -Force -ErrorAction SilentlyContinue
+PS C:\Windows\System32> Remove-Item -Path "$env:USERPROFILE\Desktop\Woodlanders Launcher.lnk" -Force -ErrorAction SilentlyContinue
+PS C:\Windows\System32> Remove-Item -Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Woodlanders" -Recurse -Force -ErrorAction SilentlyContinue
+PS C:\Windows\System32> Write-Host "Launcher installation removed" -ForegroundColor Green
+Launcher installation removed
+PS C:\Windows\System32>
+```

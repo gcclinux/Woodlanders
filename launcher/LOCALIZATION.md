@@ -36,7 +36,7 @@ Translation files are located in `launcher/src/main/resources/localization/` as 
 {
   "launcher": {
     "title": "Woodlanders Launcher",
-    "project_site": "Project site: gcclinux.github.io/Woodlanders",
+    "project_site": "Project site: gcclinux.github.io/woodlanders",
     "version_format": "Local: {0} | Remote: {1}",
     "button": {
       "launch": "Launch Woodlanders",

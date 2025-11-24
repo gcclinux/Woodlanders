@@ -1,7 +1,7 @@
 {
   "launcher": {
     "title": "Woodlanders Launcher",
-    "project_site": "Projektseite: gcclinux.github.io/Woodlanders",
+    "project_site": "Projektseite: gcclinux.github.io/woodlanders",
     "version_format": "Lokal: {0} | Remote: {1}",
     "button": {
       "launch": "Woodlanders Starten",

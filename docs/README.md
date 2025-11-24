@@ -410,12 +410,6 @@ Include:
 - Relevant log excerpts
 - Steps to reproduce the issue
 
-### Support Channels
-
-- **Repository**: https://wagemaker.uk:3000/ricardo/Woodlanders
-- **Issues**: https://wagemaker.uk:3000/ricardo/Woodlanders/issues
-- **Documentation**: https://wagemaker.uk:3000/ricardo/Woodlanders/wiki
-
 ## Additional Resources
 
 ### External Documentation
