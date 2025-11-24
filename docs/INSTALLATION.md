@@ -1,3 +1,17 @@
+## 🚀 Quick Start (Recommended)
+
+For the easiest installation experience with automatic updates:
+
+**📥 [Download Woodlanders Launcher](https://github.com/gcclinux/woodlanders-launcher/releases/latest)**
+
+The launcher provides:
+- ✅ Single-click download and installation
+- 🔄 Automatic update checks
+- 🎮 Easy game launch
+- 📦 No manual dependency management required
+
+---
+
 ## Requirements
 - Java 21+ (OpenJDK 21.0.8 or higher)
 - Gradle 9.2.0+
