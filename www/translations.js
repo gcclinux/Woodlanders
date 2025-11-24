@@ -136,7 +136,9 @@ const translations = {
         about_edu_4: "✅ Professional Java code organization and design patterns",
         about_edu_5: "✅ Cross-platform game development (Windows, macOS, Linux)",
         about_support_title: "🤝 Community & Support",
-        about_support_desc: "Open source and actively maintained. Report bugs, suggest features, or contribute on GitHub. Support the project through sponsorships or donations."
+        about_support_desc: "Open source and actively maintained. Report bugs, suggest features, or contribute on GitHub. Support the project through sponsorships or donations.",
+        btn_download: "⬇️ Download Direct",
+        btn_download_launcher: "🚀 Download Launcher"
     },
     pl: {
         nav_about: "O grze",
@@ -275,7 +277,9 @@ const translations = {
         about_edu_4: "✅ Profesjonalna organizacja kodu Java i wzorce projektowe",
         about_edu_5: "✅ Rozwój gier wieloplatformowych (Windows, macOS, Linux)",
         about_support_title: "🤝 Społeczność i wsparcie",
-        about_support_desc: "Open source i aktywnie utrzymywany. Zgłaszaj błędy, sugeruj funkcje lub współpracuj na GitHub. Wspieraj projekt poprzez sponsoring lub darowizny."
+        about_support_desc: "Open source i aktywnie utrzymywany. Zgłaszaj błędy, sugeruj funkcje lub współpracuj na GitHub. Wspieraj projekt poprzez sponsoring lub darowizny.",
+        btn_download: "⬇️ Pobierz Bezpośrednio",
+        btn_download_launcher: "🚀 Pobierz Launcher"
     },
     de: {
         nav_about: "Über",
@@ -414,7 +418,9 @@ const translations = {
         about_edu_4: "✅ Professionelle Java-Code-Organisation und Designmuster",
         about_edu_5: "✅ Plattformübergreifende Spieleentwicklung (Windows, macOS, Linux)",
         about_support_title: "🤝 Community & Unterstützung",
-        about_support_desc: "Open Source und aktiv gepflegt. Melden Sie Fehler, schlagen Sie Features vor oder tragen Sie auf GitHub bei. Unterstützen Sie das Projekt durch Sponsoring oder Spenden."
+        about_support_desc: "Open Source und aktiv gepflegt. Melden Sie Fehler, schlagen Sie Features vor oder tragen Sie auf GitHub bei. Unterstützen Sie das Projekt durch Sponsoring oder Spenden.",
+        btn_download: "⬇️ Direkt Herunterladen",
+        btn_download_launcher: "🚀 Launcher Herunterladen"
     },
     nl: {
         nav_about: "Over",
@@ -553,7 +559,9 @@ const translations = {
         about_edu_4: "✅ Professionele Java-code-organisatie en ontwerppatronen",
         about_edu_5: "✅ Cross-platform game-ontwikkeling (Windows, macOS, Linux)",
         about_support_title: "🤝 Community & Ondersteuning",
-        about_support_desc: "Open source en actief onderhouden. Meld bugs, stel features voor of draag bij op GitHub. Ondersteun het project via sponsoring of donaties."
+        about_support_desc: "Open source en actief onderhouden. Meld bugs, stel features voor of draag bij op GitHub. Ondersteun het project via sponsoring of donaties.",
+        btn_download: "⬇️ Direct Downloaden",
+        btn_download_launcher: "🚀 Launcher Downloaden"
     },
     pt: {
         nav_about: "Sobre",
@@ -692,6 +700,8 @@ const translations = {
         about_edu_4: "✅ Organização de código Java profissional e padrões de design",
         about_edu_5: "✅ Desenvolvimento de jogos multiplataforma (Windows, macOS, Linux)",
         about_support_title: "🤝 Comunidade e Suporte",
-        about_support_desc: "Código aberto e ativamente mantido. Relate bugs, sugira recursos ou contribua no GitHub. Apoie o projeto através de patrocínios ou doações."
+        about_support_desc: "Código aberto e ativamente mantido. Relate bugs, sugira recursos ou contribua no GitHub. Apoie o projeto através de patrocínios ou doações.",
+        btn_download: "⬇️ Baixar Direto",
+        btn_download_launcher: "🚀 Baixar Launcher"
     }
 };

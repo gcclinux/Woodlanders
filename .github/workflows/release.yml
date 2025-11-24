@@ -77,6 +77,10 @@ jobs:
           cd dist
           Compress-Archive -Path Woodlanders -DestinationPath Woodlanders-Windows-Portable.zip
       
+      - name: Download Launcher from other repo
+        run: |
+          curl -L -o woodlanders-launcher-windows-installer.zip https://github.com/gcclinux/woodlanders-launcher/releases/latest/download/woodlanders-launcher-windows-installer-0.1.0.zip
+      
       - name: Get tag name
         id: get_tag
         shell: bash
@@ -109,6 +113,9 @@ jobs:
             - **Woodlanders-Linux-x86_64.AppImage** - Linux executable with bundled JRE (no Java installation required)
             - **woodlanders-client.jar** - Client JAR (requires Java 21+)
             - **woodlanders-server.jar** - Dedicated server JAR (requires Java 21+)
+            - **woodlanders-launcher-windows-installer.zip** - Windows launcher with auto-update support
+            
+            > **Alternative Launcher**: For the latest launcher features and updates, visit the [Woodlanders Launcher repository](https://github.com/gcclinux/woodlanders-launcher/releases/latest/)
             
             ## Server Requirements by Player Count
             | Players | CPU Cores | RAM | Upload Speed |
@@ -169,6 +176,7 @@ jobs:
             ./dist/Woodlanders-Windows-Portable.zip
             ./build/libs/woodlanders-client.jar
             ./build/libs/woodlanders-server.jar
+            ./woodlanders-launcher-windows-installer.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
