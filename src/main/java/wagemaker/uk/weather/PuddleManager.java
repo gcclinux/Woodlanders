@@ -32,6 +32,7 @@ public class PuddleManager {
     private PuddleState currentState;
     private float accumulationTimer;
     private float evaporationTimer;
+    private PuddleCollisionSystem collisionSystem;
     
     // Performance monitoring
     private float logTimer;
@@ -48,6 +49,7 @@ public class PuddleManager {
         this.accumulationTimer = 0.0f;
         this.evaporationTimer = 0.0f;
         this.logTimer = 0.0f;
+        this.collisionSystem = null;
     }
     
     /**
@@ -87,6 +89,11 @@ public class PuddleManager {
                 puddleRenderer.clearAllPuddles();
                 accumulationTimer = 0.0f;
                 evaporationTimer = 0.0f;
+                
+                // Clear collision system triggered states
+                if (collisionSystem != null) {
+                    collisionSystem.clearAllTriggeredStates();
+                }
             }
             return;
         }
@@ -122,6 +129,11 @@ public class PuddleManager {
                     currentState = PuddleState.NONE;
                     accumulationTimer = 0.0f;
                     logStateTransition(previousState, currentState);
+                    
+                    // Clear collision system triggered states
+                    if (collisionSystem != null) {
+                        collisionSystem.clearAllTriggeredStates();
+                    }
                 } else {
                     // Continue accumulating
                     accumulationTimer += deltaTime;
@@ -171,6 +183,11 @@ public class PuddleManager {
                         puddleRenderer.clearAllPuddles();
                         evaporationTimer = 0.0f;
                         logStateTransition(previousState, currentState);
+                        
+                        // Clear collision system triggered states
+                        if (collisionSystem != null) {
+                            collisionSystem.clearAllTriggeredStates();
+                        }
                     } else {
                         // Update puddle alpha based on evaporation progress
                         float alphaMultiplier = 1.0f - (evaporationTimer / PuddleConfig.EVAPORATION_DURATION);
@@ -245,6 +262,31 @@ public class PuddleManager {
      */
     public int getActivePuddleCount() {
         return puddleRenderer.getActivePuddleCount();
+    }
+    
+    /**
+     * Gets a list of currently active puddles for collision detection.
+     * Iterates through the puddle pool and collects all active puddles.
+     * 
+     * @return List of active puddles
+     */
+    public java.util.List<WaterPuddle> getActivePuddles() {
+        java.util.List<WaterPuddle> activePuddles = new java.util.ArrayList<>();
+        for (WaterPuddle puddle : puddleRenderer.getPuddlePool()) {
+            if (puddle.isActive()) {
+                activePuddles.add(puddle);
+            }
+        }
+        return activePuddles;
+    }
+    
+    /**
+     * Sets the collision system to notify when puddles are cleared.
+     * 
+     * @param collisionSystem The collision system to notify
+     */
+    public void setCollisionSystem(PuddleCollisionSystem collisionSystem) {
+        this.collisionSystem = collisionSystem;
     }
     
     /**

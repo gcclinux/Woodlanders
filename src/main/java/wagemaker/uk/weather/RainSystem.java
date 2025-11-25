@@ -150,6 +150,16 @@ public class RainSystem {
     }
     
     /**
+     * Gets the puddle manager for puddle collision detection.
+     * Used by Player class to check for puddle collisions and trigger fall mechanics.
+     * 
+     * @return The PuddleManager instance
+     */
+    public PuddleManager getPuddleManager() {
+        return puddleManager;
+    }
+    
+    /**
      * Synchronizes rain zones from multiplayer server.
      * This method is called when the client receives world state from the server,
      * ensuring all clients have the same rain zone definitions.

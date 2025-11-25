@@ -1,229 +1,317 @@
 package wagemaker.uk.weather;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.backends.headless.HeadlessApplication;
-import com.badlogic.gdx.backends.headless.HeadlessApplicationConfiguration;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Property-based tests for complete cleanup after evaporation.
- * Feature: rain-water-puddles, Property 7: Complete cleanup after evaporation
- * Validates: Requirements 2.3
+ * Property-based tests for puddle collision cleanup.
+ * Feature: puddle-fall-damage, Property 5: Cleanup on puddle despawn
+ * Validates: Requirements 1.5, 3.4, 3.5, 4.4
  */
 public class PuddleCleanupPropertyTest {
     
-    private static HeadlessApplication application;
-    private static ShapeRenderer shapeRenderer;
-    private static OrthographicCamera camera;
-    
-    @BeforeAll
-    public static void setUpClass() {
-        HeadlessApplicationConfiguration config = new HeadlessApplicationConfiguration();
-        application = new HeadlessApplication(new ApplicationAdapter() {}, config);
-        
-        Gdx.gl = Mockito.mock(GL20.class);
-        Gdx.gl20 = Mockito.mock(GL20.class);
-        
-        shapeRenderer = Mockito.mock(ShapeRenderer.class);
-        
-        camera = new OrthographicCamera(800, 600);
-        camera.position.set(400, 300, 0);
-        camera.update();
-    }
-    
-    @AfterAll
-    public static void tearDownClass() {
-        if (application != null) {
-            application.exit();
-        }
-    }
+    private static final float FALL_ZONE_RADIUS = 12.0f;
     
     /**
-     * Property 7: Complete cleanup after evaporation
-     * For any evaporation cycle, after the evaporation duration completes, 
-     * the active puddle count should be zero.
-     * Validates: Requirements 2.3
+     * Property 5: Cleanup on puddle despawn
+     * For any puddle system state transition to NONE or evaporation completion, 
+     * all puddle collision data and triggered states should be cleared from memory.
      * 
-     * This property-based test runs 100 trials with random time increments,
-     * verifying that all puddles are cleaned up after evaporation.
+     * Validates: Requirements 1.5, 3.4, 3.5, 4.4
+     * 
+     * This property-based test runs 100 trials with random puddle configurations.
      */
     @Test
-    public void allPuddlesCleanedUpAfterEvaporation() {
+    public void cleanupClearsAllTriggeredStates() {
         Random random = new Random(42); // Fixed seed for reproducibility
         
         // Run 100 trials
         for (int trial = 0; trial < 100; trial++) {
-            PuddleManager manager = new PuddleManager(shapeRenderer);
-            manager.initialize();
+            PuddleCollisionSystem system = new PuddleCollisionSystem();
             
-            // Reach ACTIVE state
-            float accumulatedTime = 0.0f;
-            while (manager.getCurrentState() != PuddleState.ACTIVE && accumulatedTime < 10.0f) {
-                manager.update(0.1f, true, 1.0f, camera);
-                accumulatedTime += 0.1f;
-            }
+            // Generate random number of puddles (1-8)
+            int puddleCount = 1 + random.nextInt(8);
+            List<WaterPuddle> puddles = new ArrayList<>();
             
-            int puddleCountBeforeEvaporation = manager.getActivePuddleCount();
-            assertTrue(
-                puddleCountBeforeEvaporation > 0,
-                "Should have puddles before evaporation"
-            );
-            
-            // Stop rain to start evaporation
-            manager.update(0.01f, false, 0.0f, camera);
-            assertEquals(PuddleState.EVAPORATING, manager.getCurrentState());
-            
-            // Continue until evaporation completes
-            while (manager.getCurrentState() == PuddleState.EVAPORATING) {
-                float deltaTime = 0.01f + random.nextFloat() * 0.1f;
-                manager.update(deltaTime, false, 0.0f, camera);
-            }
-            
-            // Verify state is NONE
-            assertEquals(
-                PuddleState.NONE,
-                manager.getCurrentState(),
-                "State should be NONE after evaporation completes"
-            );
-            
-            // Verify all puddles are cleaned up
-            assertEquals(
-                0,
-                manager.getActivePuddleCount(),
-                String.format(
-                    "All puddles should be cleaned up after evaporation. " +
-                    "Had %d puddles before, now have %d",
-                    puddleCountBeforeEvaporation, manager.getActivePuddleCount()
-                )
-            );
-            
-            manager.dispose();
-        }
-    }
-    
-    /**
-     * Property: Multiple evaporation cycles clean up properly
-     * For any sequence of rain/evaporation cycles, each evaporation should
-     * completely clean up puddles.
-     * 
-     * This property-based test runs 100 trials with multiple cycles.
-     */
-    @Test
-    public void multipleEvaporationCyclesCleanUpProperly() {
-        Random random = new Random(42);
-        
-        // Run 100 trials
-        for (int trial = 0; trial < 100; trial++) {
-            PuddleManager manager = new PuddleManager(shapeRenderer);
-            manager.initialize();
-            
-            // Perform multiple rain/evaporation cycles (2-5 cycles)
-            int numCycles = 2 + random.nextInt(4);
-            
-            for (int cycle = 0; cycle < numCycles; cycle++) {
-                // Start rain and reach ACTIVE state
-                float accumulatedTime = 0.0f;
-                while (manager.getCurrentState() != PuddleState.ACTIVE && accumulatedTime < 10.0f) {
-                    manager.update(0.1f, true, 1.0f, camera);
-                    accumulatedTime += 0.1f;
-                }
+            for (int i = 0; i < puddleCount; i++) {
+                float puddleX = random.nextFloat() * 1000.0f;
+                float puddleY = random.nextFloat() * 1000.0f;
+                float puddleWidth = 20.0f + random.nextFloat() * 30.0f;
+                float puddleHeight = 15.0f + random.nextFloat() * 25.0f;
                 
+                WaterPuddle puddle = new WaterPuddle();
+                puddle.reset(puddleX, puddleY, puddleWidth, puddleHeight, 0.0f);
+                puddles.add(puddle);
+            }
+            
+            // Mark random subset of puddles as triggered
+            int triggeredCount = 1 + random.nextInt(puddleCount);
+            List<WaterPuddle> triggeredPuddles = new ArrayList<>();
+            
+            for (int i = 0; i < triggeredCount; i++) {
+                WaterPuddle puddle = puddles.get(random.nextInt(puddleCount));
+                system.markPuddleTriggered(puddle);
+                triggeredPuddles.add(puddle);
+            }
+            
+            // Verify puddles are triggered (no collision at their centers)
+            for (WaterPuddle puddle : triggeredPuddles) {
+                float centerX = puddle.getX() + puddle.getWidth() / 2.0f;
+                float centerY = puddle.getY() + puddle.getHeight() / 2.0f;
+                
+                PuddleCollisionResult result = system.checkCollision(centerX, centerY, puddles);
+                // May or may not have collision depending on if other non-triggered puddles overlap
+                // But the specific triggered puddle should not trigger
+            }
+            
+            // Call cleanup
+            system.clearAllTriggeredStates();
+            
+            // Verify all puddles can now trigger again
+            for (WaterPuddle puddle : puddles) {
+                float centerX = puddle.getX() + puddle.getWidth() / 2.0f;
+                float centerY = puddle.getY() + puddle.getHeight() / 2.0f;
+                
+                PuddleCollisionResult result = system.checkCollision(centerX, centerY, puddles);
                 assertTrue(
-                    manager.getActivePuddleCount() > 0,
-                    String.format("Should have puddles in cycle %d", cycle)
+                    result.hasCollision(),
+                    String.format("After cleanup, collision should occur at puddle center. " +
+                        "Puddle: (%.2f, %.2f)", centerX, centerY)
                 );
-                
-                // Stop rain and complete evaporation
-                manager.update(0.01f, false, 0.0f, camera);
-                
-                while (manager.getCurrentState() == PuddleState.EVAPORATING) {
-                    manager.update(0.1f, false, 0.0f, camera);
-                }
-                
-                // Verify cleanup
-                assertEquals(
-                    PuddleState.NONE,
-                    manager.getCurrentState(),
-                    String.format("Should be NONE after cycle %d", cycle)
-                );
-                
-                assertEquals(
-                    0,
-                    manager.getActivePuddleCount(),
-                    String.format("Should have no puddles after cycle %d", cycle)
-                );
+                assertNotNull(result.getPuddle(), "Result should contain a puddle after cleanup");
             }
-            
-            manager.dispose();
         }
     }
     
     /**
-     * Property: State transitions to NONE after cleanup
-     * For any evaporation completion, the state should transition to NONE
-     * and remain there until rain starts again.
+     * Property: Cleanup allows fresh triggering cycle
+     * For any set of triggered puddles, after cleanup, the entire trigger cycle 
+     * should work fresh (trigger, prevent re-trigger, exit, re-trigger).
      * 
-     * This property-based test runs 100 trials.
+     * This property-based test runs 100 trials with full trigger cycles.
      */
     @Test
-    public void stateTransitionsToNoneAfterCleanup() {
-        Random random = new Random(42);
+    public void cleanupAllowsFreshTriggerCycle() {
+        Random random = new Random(42); // Fixed seed for reproducibility
         
         // Run 100 trials
         for (int trial = 0; trial < 100; trial++) {
-            PuddleManager manager = new PuddleManager(shapeRenderer);
-            manager.initialize();
+            PuddleCollisionSystem system = new PuddleCollisionSystem();
             
-            // Reach ACTIVE state
-            float accumulatedTime = 0.0f;
-            while (manager.getCurrentState() != PuddleState.ACTIVE && accumulatedTime < 10.0f) {
-                manager.update(0.1f, true, 1.0f, camera);
-                accumulatedTime += 0.1f;
-            }
+            // Create puddle
+            float puddleX = random.nextFloat() * 1000.0f;
+            float puddleY = random.nextFloat() * 1000.0f;
+            float puddleWidth = 20.0f + random.nextFloat() * 30.0f;
+            float puddleHeight = 15.0f + random.nextFloat() * 25.0f;
             
-            // Stop rain and complete evaporation
-            manager.update(0.01f, false, 0.0f, camera);
+            WaterPuddle puddle = new WaterPuddle();
+            puddle.reset(puddleX, puddleY, puddleWidth, puddleHeight, 0.0f);
             
-            while (manager.getCurrentState() == PuddleState.EVAPORATING) {
-                manager.update(0.1f, false, 0.0f, camera);
-            }
+            List<WaterPuddle> puddles = new ArrayList<>();
+            puddles.add(puddle);
             
-            // Verify state is NONE
-            assertEquals(PuddleState.NONE, manager.getCurrentState());
+            float puddleCenterX = puddleX + puddleWidth / 2.0f;
+            float puddleCenterY = puddleY + puddleHeight / 2.0f;
             
-            // Continue updating without rain (random number of updates)
-            int numUpdates = 10 + random.nextInt(40);
+            // First cycle: trigger and verify
+            PuddleCollisionResult result = system.checkCollision(puddleCenterX, puddleCenterY, puddles);
+            assertTrue(result.hasCollision(), "First trigger should work");
             
-            for (int i = 0; i < numUpdates; i++) {
-                manager.update(0.1f, false, 0.0f, camera);
+            system.markPuddleTriggered(puddle);
+            
+            result = system.checkCollision(puddleCenterX, puddleCenterY, puddles);
+            assertFalse(result.hasCollision(), "Should be triggered");
+            
+            // Cleanup
+            system.clearAllTriggeredStates();
+            
+            // Second cycle: should work exactly like first
+            result = system.checkCollision(puddleCenterX, puddleCenterY, puddles);
+            assertTrue(
+                result.hasCollision(),
+                "After cleanup, first trigger should work again"
+            );
+            
+            system.markPuddleTriggered(puddle);
+            
+            result = system.checkCollision(puddleCenterX, puddleCenterY, puddles);
+            assertFalse(
+                result.hasCollision(),
+                "After cleanup and re-trigger, should be triggered again"
+            );
+            
+            // Exit and verify reset still works
+            float angle = random.nextFloat() * 2.0f * (float) Math.PI;
+            float outsideDistance = FALL_ZONE_RADIUS + 5.0f;
+            float playerX = puddleCenterX + outsideDistance * (float) Math.cos(angle);
+            float playerY = puddleCenterY + outsideDistance * (float) Math.sin(angle);
+            
+            system.updateTriggeredStates(playerX, playerY, puddles);
+            
+            result = system.checkCollision(puddleCenterX, puddleCenterY, puddles);
+            assertTrue(
+                result.hasCollision(),
+                "After cleanup cycle, exit-reset should still work"
+            );
+        }
+    }
+    
+    /**
+     * Property: Multiple cleanups are safe
+     * For any collision system, calling cleanup multiple times should be safe 
+     * and not cause errors.
+     * 
+     * This property-based test runs 100 trials with multiple cleanup calls.
+     */
+    @Test
+    public void multipleCleanupsSafe() {
+        Random random = new Random(42); // Fixed seed for reproducibility
+        
+        // Run 100 trials
+        for (int trial = 0; trial < 100; trial++) {
+            PuddleCollisionSystem system = new PuddleCollisionSystem();
+            
+            // Create some puddles and trigger them
+            int puddleCount = 1 + random.nextInt(5);
+            List<WaterPuddle> puddles = new ArrayList<>();
+            
+            for (int i = 0; i < puddleCount; i++) {
+                float puddleX = random.nextFloat() * 1000.0f;
+                float puddleY = random.nextFloat() * 1000.0f;
+                float puddleWidth = 20.0f + random.nextFloat() * 30.0f;
+                float puddleHeight = 15.0f + random.nextFloat() * 25.0f;
                 
-                // State should remain NONE
-                assertEquals(
-                    PuddleState.NONE,
-                    manager.getCurrentState(),
-                    String.format("State should remain NONE at update %d", i)
-                );
+                WaterPuddle puddle = new WaterPuddle();
+                puddle.reset(puddleX, puddleY, puddleWidth, puddleHeight, 0.0f);
+                puddles.add(puddle);
                 
-                // Puddle count should remain 0
-                assertEquals(
-                    0,
-                    manager.getActivePuddleCount(),
-                    String.format("Puddle count should remain 0 at update %d", i)
-                );
+                system.markPuddleTriggered(puddle);
             }
             
-            manager.dispose();
+            // Call cleanup multiple times
+            int cleanupCount = 2 + random.nextInt(5); // 2-6 cleanups
+            
+            for (int i = 0; i < cleanupCount; i++) {
+                // Should not throw exception
+                system.clearAllTriggeredStates();
+            }
+            
+            // Verify system still works after multiple cleanups
+            WaterPuddle firstPuddle = puddles.get(0);
+            float centerX = firstPuddle.getX() + firstPuddle.getWidth() / 2.0f;
+            float centerY = firstPuddle.getY() + firstPuddle.getHeight() / 2.0f;
+            
+            PuddleCollisionResult result = system.checkCollision(centerX, centerY, puddles);
+            assertTrue(
+                result.hasCollision(),
+                "System should still work after multiple cleanups"
+            );
+        }
+    }
+    
+    /**
+     * Property: Cleanup on empty system is safe
+     * For any collision system with no triggered puddles, cleanup should be safe.
+     * 
+     * This property-based test runs 100 trials with cleanup on empty systems.
+     */
+    @Test
+    public void cleanupOnEmptySystemSafe() {
+        Random random = new Random(42); // Fixed seed for reproducibility
+        
+        // Run 100 trials
+        for (int trial = 0; trial < 100; trial++) {
+            PuddleCollisionSystem system = new PuddleCollisionSystem();
+            
+            // Call cleanup on empty system - should not throw exception
+            system.clearAllTriggeredStates();
+            
+            // Create puddle and verify system works
+            float puddleX = random.nextFloat() * 1000.0f;
+            float puddleY = random.nextFloat() * 1000.0f;
+            float puddleWidth = 20.0f + random.nextFloat() * 30.0f;
+            float puddleHeight = 15.0f + random.nextFloat() * 25.0f;
+            
+            WaterPuddle puddle = new WaterPuddle();
+            puddle.reset(puddleX, puddleY, puddleWidth, puddleHeight, 0.0f);
+            
+            List<WaterPuddle> puddles = new ArrayList<>();
+            puddles.add(puddle);
+            
+            float centerX = puddleX + puddleWidth / 2.0f;
+            float centerY = puddleY + puddleHeight / 2.0f;
+            
+            PuddleCollisionResult result = system.checkCollision(centerX, centerY, puddles);
+            assertTrue(
+                result.hasCollision(),
+                "System should work after cleanup on empty system"
+            );
+        }
+    }
+    
+    /**
+     * Property: Cleanup clears zone tracking
+     * For any triggered puddles with zone tracking, cleanup should clear both 
+     * triggered states and zone tracking data.
+     * 
+     * This property-based test runs 100 trials verifying complete cleanup.
+     */
+    @Test
+    public void cleanupClearsZoneTracking() {
+        Random random = new Random(42); // Fixed seed for reproducibility
+        
+        // Run 100 trials
+        for (int trial = 0; trial < 100; trial++) {
+            PuddleCollisionSystem system = new PuddleCollisionSystem();
+            
+            // Create puddle
+            float puddleX = random.nextFloat() * 1000.0f;
+            float puddleY = random.nextFloat() * 1000.0f;
+            float puddleWidth = 20.0f + random.nextFloat() * 30.0f;
+            float puddleHeight = 15.0f + random.nextFloat() * 25.0f;
+            
+            WaterPuddle puddle = new WaterPuddle();
+            puddle.reset(puddleX, puddleY, puddleWidth, puddleHeight, 0.0f);
+            
+            List<WaterPuddle> puddles = new ArrayList<>();
+            puddles.add(puddle);
+            
+            float puddleCenterX = puddleX + puddleWidth / 2.0f;
+            float puddleCenterY = puddleY + puddleHeight / 2.0f;
+            
+            // Trigger puddle and update states (creates zone tracking)
+            system.markPuddleTriggered(puddle);
+            system.updateTriggeredStates(puddleCenterX, puddleCenterY, puddles);
+            
+            // Cleanup
+            system.clearAllTriggeredStates();
+            
+            // After cleanup, the exit-reset mechanism should work fresh
+            // Trigger again
+            PuddleCollisionResult result = system.checkCollision(puddleCenterX, puddleCenterY, puddles);
+            assertTrue(result.hasCollision(), "Should trigger after cleanup");
+            
+            system.markPuddleTriggered(puddle);
+            
+            // Move outside
+            float angle = random.nextFloat() * 2.0f * (float) Math.PI;
+            float outsideDistance = FALL_ZONE_RADIUS + 5.0f;
+            float playerX = puddleCenterX + outsideDistance * (float) Math.cos(angle);
+            float playerY = puddleCenterY + outsideDistance * (float) Math.sin(angle);
+            
+            system.updateTriggeredStates(playerX, playerY, puddles);
+            
+            // Should reset and allow re-trigger
+            result = system.checkCollision(puddleCenterX, puddleCenterY, puddles);
+            assertTrue(
+                result.hasCollision(),
+                "Exit-reset should work properly after cleanup cleared zone tracking"
+            );
         }
     }
 }

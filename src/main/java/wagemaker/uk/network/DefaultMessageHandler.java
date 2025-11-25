@@ -147,6 +147,10 @@ public class DefaultMessageHandler implements MessageHandler {
                     handlePlayerRespawn((PlayerRespawnMessage) message);
                     break;
                     
+                case PLAYER_FALL:
+                    handlePlayerFall((PlayerFallMessage) message);
+                    break;
+                    
                 case FREE_WORLD_ACTIVATION:
                     handleFreeWorldActivation((FreeWorldActivationMessage) message);
                     break;
@@ -459,6 +463,14 @@ public class DefaultMessageHandler implements MessageHandler {
                          message.getX() + ", " + message.getY() + 
                          ") with health=" + message.getHealth() + 
                          ", hunger=" + message.getHunger());
+    }
+    
+    /**
+     * Handles PLAYER_FALL message.
+     * Override this method to trigger fall animation for remote players.
+     */
+    protected void handlePlayerFall(PlayerFallMessage message) {
+        System.out.println("Player " + message.getPlayerId() + " fell in puddle " + message.getPuddleId());
     }
     
     /**

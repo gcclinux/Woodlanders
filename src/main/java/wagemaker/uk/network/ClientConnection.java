@@ -267,6 +267,10 @@ public class ClientConnection implements Runnable {
                 handlePlayerRespawn((PlayerRespawnMessage) message);
                 break;
                 
+            case PLAYER_FALL:
+                handlePlayerFall((PlayerFallMessage) message);
+                break;
+                
             case RESOURCE_RESPAWN:
             case RESPAWN_STATE:
             case FREE_WORLD_ACTIVATION:
@@ -1180,6 +1184,50 @@ public class ClientConnection implements Runnable {
             y,
             health,
             hunger
+        );
+        server.broadcastToAll(broadcastMsg);
+    }
+    
+    /**
+     * Handles a player fall message from the client.
+     * Validates the fall event and broadcasts to all clients for animation synchronization.
+     * @param message The player fall message
+     */
+    private void handlePlayerFall(PlayerFallMessage message) {
+        // Validate message data
+        if (message == null) {
+            logSecurityViolation("Null player fall message");
+            return;
+        }
+        
+        String playerId = message.getPlayerId();
+        String puddleId = message.getPuddleId();
+        
+        // Validate player ID matches the client
+        if (!playerId.equals(clientId)) {
+            System.err.println("Player ID mismatch in fall message from " + clientId);
+            logSecurityViolation("Player ID mismatch in fall: " + playerId);
+            return;
+        }
+        
+        // Validate puddle ID is not null or empty
+        if (puddleId == null || puddleId.isEmpty()) {
+            System.err.println("Invalid puddle ID in fall message from " + clientId);
+            logSecurityViolation("Invalid puddle ID: " + puddleId);
+            return;
+        }
+        
+        // Note: We don't validate puddle existence on the server because puddles are
+        // client-side visual effects. The server trusts the client's fall detection
+        // since damage is already applied client-side and synchronized via health updates.
+        
+        System.out.println("Player " + clientId + " fell in puddle " + puddleId);
+        
+        // Broadcast fall event to all clients for animation synchronization
+        PlayerFallMessage broadcastMsg = new PlayerFallMessage(
+            "server",
+            playerId,
+            puddleId
         );
         server.broadcastToAll(broadcastMsg);
     }

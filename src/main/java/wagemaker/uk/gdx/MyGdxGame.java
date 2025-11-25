@@ -392,6 +392,9 @@ public class MyGdxGame extends ApplicationAdapter {
         rainSystem = new RainSystem(shapeRenderer);
         rainSystem.initialize();
         
+        // Connect puddle manager to player for fall damage detection
+        player.setPuddleManager(rainSystem.getPuddleManager());
+        
         // Initialize dynamic rain manager for random rain events
         dynamicRainManager = new wagemaker.uk.weather.DynamicRainManager(rainSystem.getZoneManager());
         

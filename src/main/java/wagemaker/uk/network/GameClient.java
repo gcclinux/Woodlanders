@@ -429,6 +429,21 @@ public class GameClient {
     }
     
     /**
+     * Sends a player fall event to the server.
+     * Called when player falls into a puddle.
+     * @param puddleId The ID of the puddle that triggered the fall
+     */
+    public void sendPlayerFall(String puddleId) {
+        if (clientId == null) {
+            System.err.println("Cannot send player fall: client ID not set");
+            return;
+        }
+        
+        PlayerFallMessage message = new PlayerFallMessage(clientId, clientId, puddleId);
+        sendMessage(message);
+    }
+    
+    /**
      * Sends a bamboo planting action to the server.
      * @param plantedBambooId The unique ID for the planted bamboo
      * @param x The tile-aligned x position

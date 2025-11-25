@@ -34,6 +34,9 @@ import wagemaker.uk.targeting.TargetingMode;
 import wagemaker.uk.targeting.TargetingCallback;
 import wagemaker.uk.targeting.PlantingTargetValidator;
 import wagemaker.uk.client.PlayerConfig;
+import wagemaker.uk.weather.PuddleCollisionSystem;
+import wagemaker.uk.weather.FallAnimationSystem;
+import wagemaker.uk.weather.PuddleManager;
 import java.util.Map;
 import java.util.Random;
 
@@ -44,6 +47,12 @@ public class Player {
     private float health = 100; // Player health
     private float lastCactusDamageTime = 0; // To prevent spam damage
     private float previousHealth = 100; // Track previous health for change detection
+    
+    // Puddle fall damage system fields
+    private PuddleCollisionSystem puddleCollisionSystem;
+    private FallAnimationSystem fallAnimationSystem;
+    private boolean isFalling = false;
+    private PuddleManager puddleManager;
     
     // Hunger system fields
     private float hunger = 0; // Hunger level (0-100%)
@@ -120,6 +129,10 @@ public class Player {
         this.targetingSystem = new TargetingSystem();
         this.targetIndicatorRenderer = new TargetIndicatorRenderer();
         this.targetIndicatorRenderer.initialize();
+        
+        // Initialize puddle fall damage systems
+        this.puddleCollisionSystem = new PuddleCollisionSystem();
+        this.fallAnimationSystem = new FallAnimationSystem();
     }
     
     public void setTrees(Map<String, SmallTree> trees) {
@@ -221,6 +234,11 @@ public class Player {
     public void setPlantedTrees(Map<String, PlantedTree> plantedTrees) {
         this.plantedTrees = plantedTrees;
         updateTargetingValidator();
+    }
+    
+    public void setPuddleManager(PuddleManager puddleManager) {
+        this.puddleManager = puddleManager;
+        System.out.println("DEBUG: PuddleManager set on Player - puddle fall damage enabled");
     }
     
     /**
@@ -332,6 +350,19 @@ public class Player {
     }
 
     public void update(float deltaTime) {
+        // Update fall animation if active
+        if (isFalling) {
+            fallAnimationSystem.update(deltaTime);
+            
+            // Check if sequence complete
+            if (fallAnimationSystem.isFallSequenceComplete()) {
+                completeFall();
+            }
+            
+            // Skip normal movement processing while falling
+            return;
+        }
+        
         isMoving = false;
         
         // Handle inventory navigation mode toggle (only when menu is not open)
@@ -483,6 +514,25 @@ public class Player {
             animTime = 0;
         }
         
+        // Check for puddle collision (only when not falling)
+        if (!isFalling && puddleManager != null) {
+            java.util.List<wagemaker.uk.weather.WaterPuddle> activePuddles = puddleManager.getActivePuddles();
+            
+            // Calculate player center (player sprite is 64x64, so center is +32)
+            float playerCenterX = x + 32;
+            float playerCenterY = y + 32;
+            
+            wagemaker.uk.weather.PuddleCollisionResult collision = 
+                puddleCollisionSystem.checkCollision(playerCenterX, playerCenterY, activePuddles);
+            
+            if (collision.hasCollision()) {
+                triggerFall(collision.getPuddle());
+            }
+            
+            // Update triggered states after normal movement
+            puddleCollisionSystem.updateTriggeredStates(playerCenterX, playerCenterY, activePuddles);
+        }
+        
         // Check for cactus damage
         checkCactusDamage(deltaTime);
         
@@ -631,6 +681,12 @@ public class Player {
     }
 
     public TextureRegion getCurrentFrame() {
+        // Check if falling and return fall animation frame
+        if (isFalling) {
+            return fallAnimationSystem.getCurrentFallFrame();
+        }
+        
+        // Otherwise return normal animation frame
         if (isMoving) {
             return currentAnimation.getKeyFrame(animTime);
         } else {
@@ -1633,6 +1689,50 @@ public class Player {
         y = newY;
         
         System.out.println("Player respawned!");
+    }
+    
+    /**
+     * Trigger the fall sequence when player steps in a puddle.
+     * Sets falling flag, starts animation, marks puddle as triggered, and applies damage.
+     * Requirements: 1.2, 4.1
+     */
+    private void triggerFall(wagemaker.uk.weather.WaterPuddle puddle) {
+        // Set falling flag
+        isFalling = true;
+        
+        // Start fall animation sequence
+        fallAnimationSystem.startFallSequence();
+        
+        // Mark puddle as triggered
+        puddleCollisionSystem.markPuddleTriggered(puddle);
+        
+        // Apply 10% damage to health
+        float damage = 10.0f;
+        health = Math.max(0, health - damage);
+        
+        System.out.println("Player fell in puddle! Health: " + health);
+        
+        // Send fall event to server in multiplayer
+        if (gameClient != null && gameClient.isConnected()) {
+            gameClient.sendPlayerFall(puddle.getId());
+        }
+        
+        // Send health update in multiplayer
+        checkAndSendHealthUpdate();
+    }
+    
+    /**
+     * Complete the fall sequence and restore normal player state.
+     * Requirements: 1.4, 2.6
+     */
+    private void completeFall() {
+        // Set falling flag to false
+        isFalling = false;
+        
+        // Reset fall animation system
+        fallAnimationSystem.reset();
+        
+        System.out.println("Fall sequence complete, player can move again");
     }
     
     public float getHealth() {

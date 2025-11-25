@@ -128,22 +128,23 @@ public class PlayerConfig {
                 }
             }
             
-            System.out.println("Player configuration loaded successfully from " + configFile.getAbsolutePath());
-            if (config.lastServer != null) {
-                System.out.println("Last server: " + config.lastServer);
-            }
-            if (config.compassTargetX != null && config.compassTargetY != null) {
-                System.out.println("Compass target: (" + config.compassTargetX + ", " + config.compassTargetY + ")");
-            }
-            if (config.language != null) {
-                System.out.println("Language: " + config.language);
-            }
-            if (config.fontName != null) {
-                System.out.println("Font: " + config.fontName);
-            }
-            if (config.selectedCharacter != null) {
-                System.out.println("Selected character: " + config.selectedCharacter);
-            }
+            // Commented out to reduce log spam during fall animations
+            // System.out.println("Player configuration loaded successfully from " + configFile.getAbsolutePath());
+            // if (config.lastServer != null) {
+            //     System.out.println("Last server: " + config.lastServer);
+            // }
+            // if (config.compassTargetX != null && config.compassTargetY != null) {
+            //     System.out.println("Compass target: (" + config.compassTargetX + ", " + config.compassTargetY + ")");
+            // }
+            // if (config.language != null) {
+            //     System.out.println("Language: " + config.language);
+            // }
+            // if (config.fontName != null) {
+            //     System.out.println("Font: " + config.fontName);
+            // }
+            // if (config.selectedCharacter != null) {
+            //     System.out.println("Selected character: " + config.selectedCharacter);
+            // }
             
         } catch (IOException e) {
             // File doesn't exist or cannot be read - return default config

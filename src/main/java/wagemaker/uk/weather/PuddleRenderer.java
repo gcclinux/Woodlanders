@@ -345,6 +345,15 @@ public class PuddleRenderer {
     }
     
     /**
+     * Gets the puddle pool for collision detection.
+     * 
+     * @return The list of puddles in the pool
+     */
+    public List<WaterPuddle> getPuddlePool() {
+        return puddlePool;
+    }
+    
+    /**
      * Gets the number of puddles that would be rendered in the current viewport.
      * Used for performance monitoring.
      * 

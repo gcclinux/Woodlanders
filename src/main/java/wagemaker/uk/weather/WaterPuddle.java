@@ -1,6 +1,7 @@
 package wagemaker.uk.weather;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import java.util.UUID;
 
 /**
  * Represents an individual water puddle instance.
@@ -8,6 +9,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
  */
 public class WaterPuddle {
     
+    private String id;
     private float x;
     private float y;
     private float width;
@@ -25,6 +27,7 @@ public class WaterPuddle {
     
     /**
      * Resets this puddle with new properties for reuse from the pool.
+     * Generates a new unique identifier for collision tracking.
      * 
      * @param x X position in world coordinates
      * @param y Y position in world coordinates
@@ -33,6 +36,7 @@ public class WaterPuddle {
      * @param rotation Rotation angle in degrees for visual variety
      */
     public void reset(float x, float y, float width, float height, float rotation) {
+        this.id = UUID.randomUUID().toString();
         this.x = x;
         this.y = y;
         this.width = width;
@@ -85,6 +89,10 @@ public class WaterPuddle {
     }
     
     // Getters
+    
+    public String getId() {
+        return id;
+    }
     
     public float getX() {
         return x;

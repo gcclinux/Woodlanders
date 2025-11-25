@@ -503,6 +503,27 @@ public class GameMessageHandler extends DefaultMessageHandler {
     }
     
     @Override
+    protected void handlePlayerFall(wagemaker.uk.network.PlayerFallMessage message) {
+        String playerId = message.getPlayerId();
+        String puddleId = message.getPuddleId();
+        
+        System.out.println("Player " + playerId + " fell in puddle " + puddleId);
+        
+        // Don't trigger fall animation for local player (already handled locally)
+        if (game.getGameClient() != null && 
+            playerId.equals(game.getGameClient().getClientId())) {
+            return;
+        }
+        
+        // Trigger fall animation for remote player
+        RemotePlayer remotePlayer = game.getRemotePlayers().get(playerId);
+        if (remotePlayer != null) {
+            remotePlayer.triggerFall();
+            System.out.println("Triggered fall animation for remote player " + playerId);
+        }
+    }
+    
+    @Override
     protected void handleFreeWorldActivation(FreeWorldActivationMessage message) {
         if (message.isActivated()) {
             FreeWorldManager.activateFreeWorld();

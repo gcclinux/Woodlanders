@@ -24,6 +24,10 @@ public class RemotePlayer {
     private boolean isMoving;
     private float animTime;
     
+    // Fall animation system
+    private wagemaker.uk.weather.FallAnimationSystem fallAnimationSystem;
+    private boolean isFalling;
+    
     // Animation components
     private Texture spriteSheet;
     private Animation<TextureRegion> walkUpAnimation;
@@ -54,9 +58,13 @@ public class RemotePlayer {
         this.hunger = 0; // Initialize hunger to 0
         this.isMoving = isMoving;
         this.animTime = 0;
+        this.isFalling = false;
         
         loadAnimations();
         updateCurrentAnimation();
+        
+        // Initialize fall animation system
+        this.fallAnimationSystem = new wagemaker.uk.weather.FallAnimationSystem();
     }
     
     /**
@@ -175,6 +183,18 @@ public class RemotePlayer {
      * Update animation and interpolate position.
      */
     public void update(float deltaTime) {
+        // Update fall animation if active
+        if (isFalling) {
+            fallAnimationSystem.update(deltaTime);
+            
+            if (fallAnimationSystem.isFallSequenceComplete()) {
+                completeFall();
+            }
+            
+            // Skip normal movement processing while falling
+            return;
+        }
+        
         // Interpolate position for smooth movement
         float dx = targetX - x;
         float dy = targetY - y;
@@ -207,6 +227,11 @@ public class RemotePlayer {
      * Get the current animation frame.
      */
     private TextureRegion getCurrentFrame() {
+        // If falling, return fall animation frame from remote player's sprite sheet
+        if (isFalling) {
+            return getRemoteFallFrame();
+        }
+        
         if (isMoving) {
             return currentAnimation.getKeyFrame(animTime);
         } else {
@@ -224,6 +249,64 @@ public class RemotePlayer {
                     return idleDownFrame; // Fallback
             }
         }
+    }
+    
+    /**
+     * Gets the fall animation frame from the remote player's sprite sheet.
+     * Uses the same coordinates as FallAnimationSystem but with the remote sprite sheet.
+     */
+    private TextureRegion getRemoteFallFrame() {
+        // Get the current frame coordinates from the fall animation system
+        wagemaker.uk.weather.FallAnimationSystem.FallAnimationState state = 
+            fallAnimationSystem.getCurrentState();
+        
+        int spriteX;
+        int spriteY = 1280; // Y coordinate for all fall/standup frames
+        
+        // Map state to sprite X coordinate
+        switch (state) {
+            case FALL:
+                spriteX = 256;
+                break;
+            case STANDUP_1:
+                spriteX = 192;
+                break;
+            case STANDUP_2:
+                spriteX = 128;
+                break;
+            case STANDUP_3:
+                spriteX = 64;
+                break;
+            case STANDUP_4:
+                spriteX = 0;
+                break;
+            default:
+                return idleDownFrame; // Fallback to idle frame
+        }
+        
+        // Extract 64x64 TextureRegion from remote player's sprite sheet
+        return new TextureRegion(spriteSheet, spriteX, spriteY, 64, 64);
+    }
+    
+    /**
+     * Trigger the fall animation sequence for this remote player.
+     * Called when receiving a fall event from the server.
+     */
+    public void triggerFall() {
+        if (!isFalling) {
+            isFalling = true;
+            fallAnimationSystem.startFallSequence();
+            System.out.println("Remote player " + playerId + " started fall animation");
+        }
+    }
+    
+    /**
+     * Complete the fall sequence and restore normal animation.
+     */
+    private void completeFall() {
+        isFalling = false;
+        fallAnimationSystem.reset();
+        System.out.println("Remote player " + playerId + " completed fall animation");
     }
     
     // Getters
