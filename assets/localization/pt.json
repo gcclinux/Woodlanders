@@ -26,8 +26,12 @@
     "title": "Selecione Seu Personagem",
     "girl_red": "Menina (Vermelha)",
     "girl_navy": "Menina (Marinha)",
+    "girl_green": "Menina (Verde)",
+    "girl_walnut": "Menina (Nogueira)",
     "boy_red": "Menino (Vermelho)",
     "boy_navy": "Menino (Marinho)",
+    "boy_green": "Menino (Verde)",
+    "boy_walnut": "Menino (Nogueira)",
     "navigation_instruction": "Setas para navegar",
     "confirm_instruction": "Enter para confirmar",
     "cancel_instruction": "ESC para cancelar"

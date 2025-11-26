@@ -33,11 +33,11 @@ This document specifies the requirements for a character selection feature that 
 
 #### Acceptance Criteria
 
-1. WHEN the Character Selection Menu is displayed THEN the system SHALL render a 2x2 grid of character preview cells
-2. WHEN rendering each grid cell THEN the system SHALL draw a 64x64 pixel square with a 2-pixel white border
-3. WHEN rendering character previews THEN the system SHALL display each character sprite at 48x48 pixels centered within its 64x64 pixel cell
-4. WHEN rendering character previews THEN the system SHALL extract the idle frame from position (0, 2048) of each character sprite sheet
-5. WHEN displaying the grid THEN the system SHALL show the following characters in order: girl_red_start.png (top-left), girl_navy_start.png (top-right), boy_red_start.png (bottom-left), boy_navy_start.png (bottom-right)
+1. WHEN the Character Selection Menu is displayed THEN the system SHALL render a 2x4 grid of character preview cells (2 columns, 4 rows)
+2. WHEN rendering each grid cell THEN the system SHALL draw a 128x128 pixel square with a 2-pixel white border
+3. WHEN rendering character previews THEN the system SHALL display each character sprite at 96x96 pixels centered within its 128x128 pixel cell
+4. WHEN rendering character previews THEN the system SHALL extract the idle frame from position (0, 1664) of each character sprite sheet
+5. WHEN displaying the grid THEN the system SHALL show the following characters in order: girl_red_start.png (row 0, col 0), girl_navy_start.png (row 0, col 1), girl_green_start.png (row 1, col 0), girl_walnut_start.png (row 1, col 1), boy_red_start.png (row 2, col 0), boy_navy_start.png (row 2, col 1), boy_green_start.png (row 3, col 0), boy_walnut_start.png (row 3, col 1)
 
 ### Requirement 3
 
@@ -50,7 +50,7 @@ This document specifies the requirements for a character selection feature that 
 3. WHEN the user presses the DOWN arrow key THEN the system SHALL move the selection to the cell below the current selection
 4. WHEN the user presses the LEFT arrow key THEN the system SHALL move the selection to the cell to the left of the current selection
 5. WHEN the user presses the RIGHT arrow key THEN the system SHALL move the selection to the cell to the right of the current selection
-6. WHEN the user navigates beyond the grid boundaries THEN the system SHALL wrap the selection to the opposite side of the grid
+6. WHEN the user navigates beyond the grid boundaries THEN the system SHALL wrap the selection to the opposite side of the grid (UP from row 0 wraps to row 3, DOWN from row 3 wraps to row 0, LEFT from column 0 wraps to column 1, RIGHT from column 1 wraps to column 0)
 
 ### Requirement 4
 
@@ -85,5 +85,5 @@ This document specifies the requirements for a character selection feature that 
 1. WHEN the Character Selection Menu is displayed THEN the system SHALL render all text using the LocalizationManager
 2. WHEN the user changes the game language THEN the system SHALL update the Character Selection Menu text to the new language
 3. WHEN the Character Selection Menu is opened THEN the system SHALL display the menu title in the current language
-4. WHEN localization files are loaded THEN the system SHALL include translations for "Choose Character" in all supported languages (English, German, Dutch, Polish, Portuguese)
+4. WHEN localization files are loaded THEN the system SHALL include translations for "Choose Character" and all 8 character names (Girl Red, Girl Navy, Girl Green, Girl Walnut, Boy Red, Boy Navy, Boy Green, Boy Walnut) in all supported languages (English, German, Dutch, Polish, Portuguese)
 5. WHEN the Character Selection Menu displays instructions THEN the system SHALL show keyboard navigation hints in the current language

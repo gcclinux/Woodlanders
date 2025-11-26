@@ -26,8 +26,12 @@
     "title": "Selecteer Je Karakter",
     "girl_red": "Meisje (Rood)",
     "girl_navy": "Meisje (Marine)",
+    "girl_green": "Meisje (Groen)",
+    "girl_walnut": "Meisje (Walnoot)",
     "boy_red": "Jongen (Rood)",
     "boy_navy": "Jongen (Marine)",
+    "boy_green": "Jongen (Groen)",
+    "boy_walnut": "Jongen (Walnoot)",
     "navigation_instruction": "Pijltjestoetsen om te navigeren",
     "confirm_instruction": "Enter om te bevestigen",
     "cancel_instruction": "ESC om te annuleren"

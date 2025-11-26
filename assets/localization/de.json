@@ -26,8 +26,12 @@
     "title": "Wähle Deinen Charakter",
     "girl_red": "Mädchen (Rot)",
     "girl_navy": "Mädchen (Marine)",
+    "girl_green": "Mädchen (Grün)",
+    "girl_walnut": "Mädchen (Walnuss)",
     "boy_red": "Junge (Rot)",
     "boy_navy": "Junge (Marine)",
+    "boy_green": "Junge (Grün)",
+    "boy_walnut": "Junge (Walnuss)",
     "navigation_instruction": "Pfeiltasten zum Navigieren",
     "confirm_instruction": "Enter zum Bestätigen",
     "cancel_instruction": "ESC zum Abbrechen"

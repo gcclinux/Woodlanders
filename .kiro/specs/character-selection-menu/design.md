@@ -61,6 +61,12 @@ private static class CharacterOption {
 }
 ```
 
+**Grid Layout:**
+- 2 columns × 4 rows = 8 character options
+- Cell size: 128×128 pixels
+- Preview size: 96×96 pixels (centered in cell)
+- Dialog dimensions: 550×800 pixels
+
 ### PlayerConfig Extension
 
 Extends the existing PlayerConfig class to include character selection persistence.
@@ -115,21 +121,25 @@ Adds "Choose Character" menu option to the existing PlayerProfileMenu.
 
 ### Character Options
 
-The system supports four character sprites:
+The system supports eight character sprites:
 
 | Grid Position | Sprite Filename | Display Name |
 |--------------|-----------------|--------------|
-| Top-Left (0,0) | girl_red_start.png | Girl (Red) |
-| Top-Right (1,0) | girl_navy_start.png | Girl (Navy) |
-| Bottom-Left (0,1) | boy_red_start.png | Boy (Red) |
-| Bottom-Right (1,1) | boy_navy_start.png | Boy (Navy) |
+| Row 0, Col 0 | girl_red_start.png | Girl (Red) |
+| Row 0, Col 1 | girl_navy_start.png | Girl (Navy) |
+| Row 1, Col 0 | girl_green_start.png | Girl (Green) |
+| Row 1, Col 1 | girl_walnut_start.png | Girl (Walnut) |
+| Row 2, Col 0 | boy_red_start.png | Boy (Red) |
+| Row 2, Col 1 | boy_navy_start.png | Boy (Navy) |
+| Row 3, Col 0 | boy_green_start.png | Boy (Green) |
+| Row 3, Col 1 | boy_walnut_start.png | Boy (Walnut) |
 
 ### Grid Navigation
 
 Grid cells are indexed as (column, row):
 - Navigation wraps around edges
-- UP from row 0 wraps to row 1
-- DOWN from row 1 wraps to row 0
+- UP from row 0 wraps to row 3
+- DOWN from row 3 wraps to row 0
 - LEFT from column 0 wraps to column 1
 - RIGHT from column 1 wraps to column 0
 
@@ -155,8 +165,8 @@ Character preview frames are extracted from sprite sheets:
 ### Property 1: Grid navigation wrapping
 
 *For any* grid position (column, row) and any navigation direction (UP, DOWN, LEFT, RIGHT), navigating in that direction should move to the correct adjacent cell with wrapping at boundaries. Specifically:
-- UP from row 0 wraps to row 1
-- DOWN from row 1 wraps to row 0  
+- UP from row 0 wraps to row 3
+- DOWN from row 3 wraps to row 0  
 - LEFT from column 0 wraps to column 1
 - RIGHT from column 1 wraps to column 0
 
@@ -243,13 +253,13 @@ The implementation will use **JUnit with QuickTheories** for property-based test
 Property-based tests will verify:
 
 1. **Grid Navigation Property** (Property 1)
-   - Generate random starting positions (column ∈ {0,1}, row ∈ {0,1})
+   - Generate random starting positions (column ∈ {0,1}, row ∈ {0,1,2,3})
    - Generate random navigation directions (UP, DOWN, LEFT, RIGHT)
    - Verify navigation produces correct wrapped position
    - Tag: `**Feature: character-selection-menu, Property 1: Grid navigation wrapping**`
 
 2. **Persistence Round-Trip Property** (Property 2)
-   - Generate random valid character filenames from the set of 4 options
+   - Generate random valid character filenames from the set of 8 options
    - Save character selection to config
    - Load config and verify same character is returned
    - Tag: `**Feature: character-selection-menu, Property 2: Character selection persistence round-trip**`

@@ -23,11 +23,11 @@ public class CharacterSelectionDialog implements LanguageChangeListener {
     private BitmapFont dialogFont;
     private CharacterOption[] characterOptions;
     private int selectedColumn = 0;  // 0-1 range
-    private int selectedRow = 0;     // 0-1 range
+    private int selectedRow = 0;     // 0-3 range (4 rows)
     private String initialCharacter = null;  // Track initial character when dialog opens
     
     private static final float DIALOG_WIDTH = 550;
-    private static final float DIALOG_HEIGHT = 600;
+    private static final float DIALOG_HEIGHT = 950;
     
     /**
      * Inner class representing a character option.
@@ -68,7 +68,7 @@ public class CharacterSelectionDialog implements LanguageChangeListener {
     private void initializeCharacterOptions() {
         LocalizationManager loc = LocalizationManager.getInstance();
         
-        characterOptions = new CharacterOption[4];
+        characterOptions = new CharacterOption[8];
         characterOptions[0] = new CharacterOption(
             loc.getText("character_selection_dialog.girl_red"),
             "girl_red_start.png"
@@ -78,12 +78,28 @@ public class CharacterSelectionDialog implements LanguageChangeListener {
             "girl_navy_start.png"
         );
         characterOptions[2] = new CharacterOption(
+            loc.getText("character_selection_dialog.girl_green"),
+            "girl_green_start.png"
+        );
+        characterOptions[3] = new CharacterOption(
+            loc.getText("character_selection_dialog.girl_walnut"),
+            "girl_walnut_start.png"
+        );
+        characterOptions[4] = new CharacterOption(
             loc.getText("character_selection_dialog.boy_red"),
             "boy_red_start.png"
         );
-        characterOptions[3] = new CharacterOption(
+        characterOptions[5] = new CharacterOption(
             loc.getText("character_selection_dialog.boy_navy"),
             "boy_navy_start.png"
+        );
+        characterOptions[6] = new CharacterOption(
+            loc.getText("character_selection_dialog.boy_green"),
+            "boy_green_start.png"
+        );
+        characterOptions[7] = new CharacterOption(
+            loc.getText("character_selection_dialog.boy_walnut"),
+            "boy_walnut_start.png"
         );
         
         // Load sprite sheets and extract idle frames
@@ -261,7 +277,7 @@ public class CharacterSelectionDialog implements LanguageChangeListener {
     public void navigateUp() {
         selectedRow--;
         if (selectedRow < 0) {
-            selectedRow = 1;  // Wrap to bottom
+            selectedRow = 3;  // Wrap to bottom (4 rows: 0-3)
         }
     }
     
@@ -270,8 +286,8 @@ public class CharacterSelectionDialog implements LanguageChangeListener {
      */
     public void navigateDown() {
         selectedRow++;
-        if (selectedRow > 1) {
-            selectedRow = 0;  // Wrap to top
+        if (selectedRow > 3) {
+            selectedRow = 0;  // Wrap to top (4 rows: 0-3)
         }
     }
     
@@ -297,9 +313,9 @@ public class CharacterSelectionDialog implements LanguageChangeListener {
     
     /**
      * Gets the currently selected character index based on grid position.
-     * Grid layout: [0,0]=0, [1,0]=1, [0,1]=2, [1,1]=3
+     * Grid layout: [0,0]=0, [1,0]=1, [0,1]=2, [1,1]=3, [0,2]=4, [1,2]=5, [0,3]=6, [1,3]=7
      * 
-     * @return The index of the selected character (0-3)
+     * @return The index of the selected character (0-7)
      */
     public int getSelectedCharacterIndex() {
         return selectedRow * 2 + selectedColumn;
@@ -317,7 +333,7 @@ public class CharacterSelectionDialog implements LanguageChangeListener {
     /**
      * Gets the currently selected row.
      * 
-     * @return The selected row (0-1)
+     * @return The selected row (0-3)
      */
     public int getSelectedRow() {
         return selectedRow;
@@ -358,11 +374,11 @@ public class CharacterSelectionDialog implements LanguageChangeListener {
         dialogFont.draw(batch, title, dialogX + 20, dialogY + DIALOG_HEIGHT - 30);
         batch.end();
         
-        // Draw 2x2 grid of character cells
+        // Draw 2x4 grid of character cells (2 columns, 4 rows)
         float cellSize = 128;
-        float cellPadding = 8;
-        float gridWidth = 2 * cellSize + cellPadding;  // 272 pixels
-        float gridHeight = 2 * cellSize + cellPadding; // 264 pixels
+        float gap = 40;  // Uniform gap between all cells (horizontal and vertical)
+        float gridWidth = 2 * cellSize + gap;  // 296 pixels
+        float gridHeight = 4 * cellSize + 3 * gap; // Height with vertical gaps
         
         // Center grid horizontally and drop it 128px lower than center
         float gridStartX = dialogX + (DIALOG_WIDTH - gridWidth) / 2;
@@ -370,10 +386,10 @@ public class CharacterSelectionDialog implements LanguageChangeListener {
         float gridStartY = gridCenterY + gridHeight / 2;  // Top of grid (LibGDX Y grows upward)
         
         // Draw grid cells and character previews
-        for (int row = 0; row < 2; row++) {
+        for (int row = 0; row < 4; row++) {
             for (int col = 0; col < 2; col++) {
-                float cellX = gridStartX + col * (cellSize + cellPadding);
-                float cellY = gridStartY - row * (cellSize + cellPadding);
+                float cellX = gridStartX + col * (cellSize + gap);
+                float cellY = gridStartY - row * (cellSize + gap);
                 
                 // Draw cell border (white or yellow if selected)
                 shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
@@ -390,6 +406,17 @@ public class CharacterSelectionDialog implements LanguageChangeListener {
                 int characterIndex = row * 2 + col;
                 if (characterIndex < characterOptions.length) {
                     CharacterOption option = characterOptions[characterIndex];
+                    
+                    // Draw character name above the cell
+                    batch.begin();
+                    dialogFont.setColor(Color.WHITE);
+                    // Center the text above the cell
+                    com.badlogic.gdx.graphics.g2d.GlyphLayout layout = new com.badlogic.gdx.graphics.g2d.GlyphLayout(dialogFont, option.displayName);
+                    float textX = cellX + (cellSize - layout.width) / 2;
+                    float textY = cellY + cellSize + 20;  // 20 pixels above the cell
+                    dialogFont.draw(batch, option.displayName, textX, textY);
+                    batch.end();
+                    
                     if (option.idleFrame != null) {
                         float previewSize = 96;
                         float previewX = cellX + (cellSize - previewSize) / 2;
@@ -427,8 +454,12 @@ public class CharacterSelectionDialog implements LanguageChangeListener {
             LocalizationManager loc = LocalizationManager.getInstance();
             characterOptions[0].displayName = loc.getText("character_selection_dialog.girl_red");
             characterOptions[1].displayName = loc.getText("character_selection_dialog.girl_navy");
-            characterOptions[2].displayName = loc.getText("character_selection_dialog.boy_red");
-            characterOptions[3].displayName = loc.getText("character_selection_dialog.boy_navy");
+            characterOptions[2].displayName = loc.getText("character_selection_dialog.girl_green");
+            characterOptions[3].displayName = loc.getText("character_selection_dialog.girl_walnut");
+            characterOptions[4].displayName = loc.getText("character_selection_dialog.boy_red");
+            characterOptions[5].displayName = loc.getText("character_selection_dialog.boy_navy");
+            characterOptions[6].displayName = loc.getText("character_selection_dialog.boy_green");
+            characterOptions[7].displayName = loc.getText("character_selection_dialog.boy_walnut");
         }
     }
     

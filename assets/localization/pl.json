@@ -26,8 +26,12 @@
     "title": "Wybierz Swoją Postać",
     "girl_red": "Dziewczyna (Czerwona)",
     "girl_navy": "Dziewczyna (Granatowa)",
+    "girl_green": "Dziewczyna (Zielona)",
+    "girl_walnut": "Dziewczyna (Orzechowa)",
     "boy_red": "Chłopiec (Czerwony)",
     "boy_navy": "Chłopiec (Granatowy)",
+    "boy_green": "Chłopiec (Zielony)",
+    "boy_walnut": "Chłopiec (Orzechowy)",
     "navigation_instruction": "Strzałki do nawigacji",
     "confirm_instruction": "Enter aby potwierdzić",
     "cancel_instruction": "ESC aby anulować"
