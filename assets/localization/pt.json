@@ -1,12 +1,14 @@
 {
   "menu": {
+    "title": "Menu Principal",
     "player_name": "Nome do Jogador",
     "player_profile": "Perfil do Jogador",
     "player_location": "Localização do Jogador",
-    "controls": "Controles",
+    "controls": "Controles do Jogador",
     "save_world": "Salvar Mundo",
     "load_world": "Carregar Mundo",
-    "free_world": "Mundo Livre",
+    "free_world": "Mundo de Itens",
+    "story_mode": "Modo História",
     "multiplayer": "Multijogador",
     "save_player": "Salvar Jogador",
     "language": "Idioma",
@@ -16,10 +18,12 @@
   "player_profile_menu": {
     "title": "Perfil do Jogador",
     "player_name": "Nome do Jogador",
+    "player_controls": "Controles do Jogador",
+    "player_location": "Localização do Jogador",
     "choose_character": "Escolher Personagem",
     "save_player": "Salvar Jogador",
-    "language": "Idioma",
     "menu_font": "Menu de Fonte",
+    "language": "Idioma",
     "back": "Voltar"
   },
   "character_selection_dialog": {
@@ -219,8 +223,8 @@
     "cannot_load_not_initialized": "Não é possível carregar mundo: Jogo não inicializado.",
     "failed_extract_state": "Falha ao extrair estado do mundo. Por favor, tente novamente.",
     "failed_restore_state": "Falha ao restaurar estado do mundo. Por favor, tente novamente.",
-    "free_world_activated": "Mundo Livre Ativado",
+    "free_world_activated": "Mundo de Itens Ativado",
     "free_world_message": "Você recebeu 250 de cada item.\n\nO salvamento está agora desativado.",
-    "save_disabled_free_world": "Salvamento desativado no modo Mundo Livre"
+    "save_disabled_free_world": "Salvamento desativado no modo Mundo de Itens"
   }
 }

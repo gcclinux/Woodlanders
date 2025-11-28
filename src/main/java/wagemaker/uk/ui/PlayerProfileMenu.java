@@ -26,7 +26,7 @@ public class PlayerProfileMenu implements LanguageChangeListener, FontChangeList
     
     // Visual properties
     private static final float MENU_WIDTH = 400;
-    private static final float MENU_HEIGHT = 310; // Increased to accommodate new option
+    private static final float MENU_HEIGHT = 380; // Increased to accommodate 8 options (0-7)
     
     // Wooden plank background
     private Texture woodenPlank;
@@ -73,10 +73,12 @@ public class PlayerProfileMenu implements LanguageChangeListener, FontChangeList
         LocalizationManager loc = LocalizationManager.getInstance();
         menuOptions = new String[] {
             loc.getText("player_profile_menu.player_name"),
+            loc.getText("player_profile_menu.player_controls"),
+            loc.getText("player_profile_menu.player_location"),
             loc.getText("player_profile_menu.choose_character"),
             loc.getText("player_profile_menu.save_player"),
-            loc.getText("player_profile_menu.language"),
             loc.getText("player_profile_menu.menu_font"),
+            loc.getText("player_profile_menu.language"),
             loc.getText("player_profile_menu.back")
         };
     }
@@ -166,12 +168,12 @@ public class PlayerProfileMenu implements LanguageChangeListener, FontChangeList
      * Handles menu option selection.
      */
     private void handleMenuSelection() {
-        // Index 1 is "Choose Character"
-        if (selectedIndex == 1) {
+        // Index 3 is "Choose Character"
+        if (selectedIndex == 3) {
             characterSelectionDialog.open();
         }
-        // Index 5 is "Back"
-        else if (selectedIndex == 5) {
+        // Index 7 is "Back"
+        else if (selectedIndex == 7) {
             close();
         }
     }
@@ -207,8 +209,8 @@ public class PlayerProfileMenu implements LanguageChangeListener, FontChangeList
         
         // Draw menu options
         for (int i = 0; i < menuOptions.length; i++) {
-            // Disable Save Player option if Free World is active (now at index 2)
-            boolean isDisabled = (i == 2 && FreeWorldManager.isFreeWorldActive());
+            // Disable Save Player option if Free World is active (now at index 4)
+            boolean isDisabled = (i == 4 && FreeWorldManager.isFreeWorldActive());
             
             // Highlight selected option in yellow, disabled in gray
             if (isDisabled) {

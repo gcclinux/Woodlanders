@@ -473,7 +473,7 @@ public class MultiplayerIntegrationTest {
                    "Client 2 not ready");
         
         // Broadcast join notification from server
-        PlayerJoinMessage joinMsg = new PlayerJoinMessage(client2Id.get(), "Player2", 0.0f, 0.0f);
+        PlayerJoinMessage joinMsg = new PlayerJoinMessage(client2Id.get(), "Player2", "man_start.png", 0.0f, 0.0f);
         server.broadcastToAll(joinMsg);
         
         // Wait for client 1 to receive join notification

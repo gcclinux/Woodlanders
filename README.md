@@ -4,7 +4,16 @@
 
 ## 🎮 The AI-Driven Game Development Story
 
-**Woodlanders** is an ambitious experiment in AI-assisted game development - a fully functional multiplayer 2D adventure game built entirely through conversational AI within the **Kiro IDE**. This project demonstrates what's possible when human creativity meets AI capabilities: no manual coding, just natural language prompts, specifications, and iterative refinement.
+**Woodlanders** is an ambitious experiment in AI-assisted game development - a fully functional multiplayer 2D adventure game built entirely through conversational AI. This project demonstrates what's possible when human creativity meets AI capabilities: no manual coding, just natural language prompts, specifications, and iterative refinement.
+
+### 🤖 AI Tools Powering This Project
+
+This game was developed using a combination of cutting-edge AI tools, each contributing to different aspects of development:
+
+- **Kiro IDE** (Primary) - The main development environment where most code generation, debugging, and feature implementation occurred through natural language conversations
+- **Amazon Q** - AI assistant embedded in Kiro IDE and available as a VSCode extension, providing intelligent code suggestions and assistance
+- **GitHub Copilot** - Used within Visual Studio Code IDE for the Woodlanders launcher, leveraging autocomplete and multiple dedicated LLMs
+- **Microsoft Copilot & Google Gemini** - AI tools for generating and identifying imagery and object items on sprite sheets, helping create visual assets
 
 ### The Vision: Zero-Code Game Development
 

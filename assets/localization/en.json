@@ -1,12 +1,14 @@
 {
   "menu": {
+    "title": "Main Menu",
     "player_name": "Player Name",
     "player_profile": "Player Profile",
     "player_location": "Player Location",
-    "controls": "Controls",
+    "controls": "Player Controls",
     "save_world": "Save World",
     "load_world": "Load World",
-    "free_world": "Free World",
+    "free_world": "Item World",
+    "story_mode": "Story Mode",
     "multiplayer": "Multiplayer",
     "save_player": "Save Player",
     "language": "Language",
@@ -16,10 +18,12 @@
   "player_profile_menu": {
     "title": "Player Profile",
     "player_name": "Player Name",
+    "player_controls": "Player Controls",
+    "player_location": "Player Location",
     "choose_character": "Choose Character",
     "save_player": "Save Player",
-    "language": "Language",
     "menu_font": "Font Menu",
+    "language": "Language",
     "back": "Back"
   },
   "character_selection_dialog": {
@@ -219,8 +223,8 @@
     "cannot_load_not_initialized": "Cannot load world: Game not initialized.",
     "failed_extract_state": "Failed to extract world state. Please try again.",
     "failed_restore_state": "Failed to restore world state. Please try again.",
-    "free_world_activated": "Free World Activated",
+    "free_world_activated": "Item World Activated",
     "free_world_message": "You have received 250 of each item.\n\nSaving is now disabled.",
-    "save_disabled_free_world": "Saving disabled in Free World mode"
+    "save_disabled_free_world": "Saving disabled in Item World mode"
   }
 }

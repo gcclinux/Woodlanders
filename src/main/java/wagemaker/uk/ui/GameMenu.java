@@ -36,8 +36,9 @@ public class GameMenu implements LanguageChangeListener, FontChangeListener {
     private Player player;
     private wagemaker.uk.gdx.MyGdxGame gameInstance;
     private wagemaker.uk.inventory.InventoryManager inventoryManager;
-    private static final float MENU_WIDTH = 400; // Increased by 60% (250 * 1.6 = 400)
-    private static final float MENU_HEIGHT = 340; // Increased to fit 9 menu items
+    private static final float MENU_WIDTH = 300; // Reduced by 25% from 400
+    private static final float MENU_HEIGHT = 325; // Reduced by 15% total to eliminate excess space after Exit
+    private static final float BORDER_INSET = 5; // Inset for border positioning
     private static final float NAME_DIALOG_WIDTH = 384; // Increased by 20% (320 * 1.2 = 384)
     private static final float NAME_DIALOG_HEIGHT = 220;
     
@@ -56,6 +57,26 @@ public class GameMenu implements LanguageChangeListener, FontChangeListener {
     
     // Player profile menu
     private PlayerProfileMenu playerProfileMenu;
+    
+    // Track where dialogs were opened from
+    private enum DialogSource {
+        NONE,
+        STARTUP,
+        MAIN_MENU,
+        PLAYER_PROFILE
+    }
+    
+    private DialogSource controlsDialogSource = DialogSource.NONE;
+    private DialogSource playerLocationDialogSource = DialogSource.NONE;
+    
+    // Track if dialogs were opened from player profile menu (legacy, kept for other dialogs)
+    private boolean dialogOpenedFromProfile = false;
+    
+    // Track if we just closed a dialog this frame (to prevent ESC from also opening main menu)
+    private boolean dialogJustClosed = false;
+    
+    // Track frames since dialog closed (to prevent immediate ESC processing)
+    private int framesSinceDialogClosed = 0;
     
     // Pending character selection (set by CharacterSelectionDialog, saved by savePlayerPosition)
     private static String pendingCharacterSelection = null;
@@ -168,25 +189,23 @@ public class GameMenu implements LanguageChangeListener, FontChangeListener {
         LocalizationManager loc = LocalizationManager.getInstance();
         
         singleplayerMenuItems = new String[] {
-            loc.getText("menu.player_profile"),
-            loc.getText("menu.player_location"),
-            loc.getText("menu.controls"),
-            loc.getText("menu.save_world"),
-            loc.getText("menu.load_world"),
-            loc.getText("menu.free_world"),
-            loc.getText("menu.multiplayer"),
-            loc.getText("menu.exit")
+            loc.getText("menu.player_profile"),      // Index 0
+            loc.getText("menu.save_world"),          // Index 1
+            loc.getText("menu.load_world"),          // Index 2
+            loc.getText("menu.free_world"),          // Index 3
+            loc.getText("menu.story_mode"),          // Index 4 - NEW
+            loc.getText("menu.multiplayer"),         // Index 5 - SHIFTED
+            loc.getText("menu.exit")                 // Index 6 - SHIFTED
         };
         
         multiplayerMenuItems = new String[] {
-            loc.getText("menu.player_profile"),
-            loc.getText("menu.player_location"),
-            loc.getText("menu.controls"),
-            loc.getText("menu.save_world"),
-            loc.getText("menu.load_world"),
-            loc.getText("menu.free_world"),
-            loc.getText("menu.disconnect"),
-            loc.getText("menu.exit")
+            loc.getText("menu.player_profile"),      // Index 0
+            loc.getText("menu.save_world"),          // Index 1
+            loc.getText("menu.load_world"),          // Index 2
+            loc.getText("menu.free_world"),          // Index 3
+            loc.getText("menu.story_mode"),          // Index 4 - NEW
+            loc.getText("menu.disconnect"),          // Index 5 - SHIFTED
+            loc.getText("menu.exit")                 // Index 6 - SHIFTED
         };
     }
     
@@ -688,6 +707,17 @@ public class GameMenu implements LanguageChangeListener, FontChangeListener {
     }
 
     public void update() {
+        // Reset the dialog just closed flag at the start of each frame
+        dialogJustClosed = false;
+        
+        // Increment frames counter if we're waiting
+        if (framesSinceDialogClosed > 0) {
+            framesSinceDialogClosed++;
+            if (framesSinceDialogClosed > 5) {
+                framesSinceDialogClosed = 0; // Reset after 5 frames (more time for key release)
+            }
+        }
+        
         // Check if we should show controls on startup (after a few frames)
         checkStartupControlsDisplay();
         
@@ -748,13 +778,25 @@ public class GameMenu implements LanguageChangeListener, FontChangeListener {
         }
         
         if (playerLocationDialog.isVisible()) {
+            boolean wasVisible = true;
             playerLocationDialog.handleInput();
+            // Check if dialog was closed by ESC this frame
+            if (wasVisible && !playerLocationDialog.isVisible()) {
+                dialogJustClosed = true;
+            }
             handlePlayerLocationDialogResult();
             return;
         }
         
         if (controlsDialog.isVisible()) {
+            boolean wasVisible = true;
             controlsDialog.handleInput();
+            // Check if dialog was closed by ESC this frame
+            if (wasVisible && !controlsDialog.isVisible()) {
+                dialogJustClosed = true;
+                framesSinceDialogClosed = 1; // Start counting frames
+            }
+            handleControlsDialogResult();
             return;
         }
         
@@ -765,14 +807,21 @@ public class GameMenu implements LanguageChangeListener, FontChangeListener {
         
         // Handle player profile menu
         if (playerProfileMenu.isOpen()) {
-            playerProfileMenu.update();
-            // Check if user selected an option
-            if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
-                handlePlayerProfileMenuSelection();
-            }
-            // Check if menu was closed (e.g., via ESC key)
-            if (!playerProfileMenu.isOpen()) {
-                isOpen = true; // Return to main menu
+            // Don't process input if we just closed a dialog this frame or within last 5 frames
+            if (!dialogJustClosed && framesSinceDialogClosed == 0) {
+                boolean wasOpen = playerProfileMenu.isOpen();
+                playerProfileMenu.update();
+                // Check if user selected an option
+                boolean selectionHandled = false;
+                if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+                    handlePlayerProfileMenuSelection();
+                    selectionHandled = true;
+                }
+                // Check if menu was closed (e.g., via ESC key)
+                // But don't open main menu if we just handled a selection (which may have opened a dialog)
+                if (!playerProfileMenu.isOpen() && !selectionHandled) {
+                    isOpen = true; // Return to main menu
+                }
             }
             return;
         }
@@ -787,8 +836,13 @@ public class GameMenu implements LanguageChangeListener, FontChangeListener {
             return;
         }
         
-        // Handle main menu
-        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+        // Handle main menu toggle with ESC key
+        // ESC opens/closes the main menu, but only when no dialogs or submenus are active
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE) && 
+            !playerProfileMenu.isOpen() && 
+            !multiplayerMenu.isOpen() && 
+            !dialogJustClosed &&
+            framesSinceDialogClosed == 0) {
             isOpen = !isOpen;
             if (isOpen) {
                 ensureValidMenuSelection();
@@ -814,6 +868,89 @@ public class GameMenu implements LanguageChangeListener, FontChangeListener {
                 }
             }
         }
+    }
+
+    /**
+     * Renders the menu title at the top of the menu background.
+     * The title is retrieved from localization and centered horizontally.
+     * 
+     * @param batch The SpriteBatch to use for rendering
+     */
+    private void renderMenuTitle(SpriteBatch batch) {
+        // Retrieve localized "menu.title" text from LocalizationManager
+        LocalizationManager loc = LocalizationManager.getInstance();
+        String titleText = loc.getText("menu.title");
+        
+        // Calculate centered X position using GlyphLayout
+        com.badlogic.gdx.graphics.g2d.GlyphLayout titleLayout = new com.badlogic.gdx.graphics.g2d.GlyphLayout();
+        titleLayout.setText(playerNameFont, titleText);
+        float titleX = menuX + (MENU_WIDTH - titleLayout.width) / 2;
+        
+        // Position title 30 pixels from top of menu
+        float titleY = menuY + MENU_HEIGHT - 30;
+        
+        // Render using playerNameFont with white color
+        playerNameFont.setColor(Color.WHITE);
+        playerNameFont.draw(batch, titleText, titleX, titleY);
+    }
+    
+    /**
+     * Renders white borders around the menu background.
+     * The borders are positioned 5 pixels inset from the menu edges.
+     * 
+     * @param shapeRenderer The ShapeRenderer to use for drawing the border
+     */
+    private void renderMenuBorders(ShapeRenderer shapeRenderer) {
+        // Calculate border dimensions based on MENU_WIDTH and MENU_HEIGHT
+        // Position border 5 pixels inset from menu edges
+        float borderX = menuX + BORDER_INSET;
+        float borderY = menuY + BORDER_INSET;
+        float borderWidth = MENU_WIDTH - (BORDER_INSET * 2);
+        float borderHeight = MENU_HEIGHT - (BORDER_INSET * 2);
+        
+        // Use ShapeRenderer to draw rectangular border
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        
+        // Use white color (1.0f, 1.0f, 1.0f, 1.0f)
+        shapeRenderer.setColor(1.0f, 1.0f, 1.0f, 1.0f);
+        
+        // Draw the border rectangle
+        shapeRenderer.rect(borderX, borderY, borderWidth, borderHeight);
+        
+        shapeRenderer.end();
+    }
+    
+    /**
+     * Renders horizontal dividers between menu sections.
+     * Dividers appear after Player Profile, Load World, and Story Mode.
+     * 
+     * @param shapeRenderer The ShapeRenderer to use for drawing lines
+     */
+    private void renderMenuDividers(ShapeRenderer shapeRenderer) {
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(1.0f, 1.0f, 1.0f, 1.0f); // White color
+        
+        float dividerX = menuX + 20; // Start 20 pixels from left edge
+        float dividerWidth = MENU_WIDTH - 40; // 20 pixels margin on each side
+        float dividerHeight = 2; // 2 pixels thick
+        
+        // Divider after Player Profile (index 0)
+        // Menu items start at menuY + MENU_HEIGHT - 70, each item is 30 pixels apart
+        // Positioned 21 pixels below item (17 base + 4 extra spacing above divider)
+        float divider1Y = menuY + MENU_HEIGHT - 70 - (0 * 30) - 21 - 4;
+        shapeRenderer.rect(dividerX, divider1Y, dividerWidth, dividerHeight);
+        
+        // Divider after Load World (index 2)
+        // Account for 4px extra spacing after first divider
+        float divider2Y = menuY + MENU_HEIGHT - 70 - (2 * 30) - 4 - 21 - 4;
+        shapeRenderer.rect(dividerX, divider2Y, dividerWidth, dividerHeight);
+        
+        // Divider after Story Mode (index 4)
+        // Account for 8px extra spacing (4px after first divider + 4px after second divider)
+        float divider3Y = menuY + MENU_HEIGHT - 70 - (4 * 30) - 8 - 21 - 4;
+        shapeRenderer.rect(dividerX, divider3Y, dividerWidth, dividerHeight);
+        
+        shapeRenderer.end();
     }
 
     public void render(SpriteBatch batch, ShapeRenderer shapeRenderer, float camX, float camY, float viewWidth, float viewHeight) {
@@ -920,6 +1057,27 @@ public class GameMenu implements LanguageChangeListener, FontChangeListener {
 
             batch.draw(woodenPlank, menuX, menuY, MENU_WIDTH, MENU_HEIGHT);
             
+            // End batch to render borders with ShapeRenderer
+            batch.end();
+            
+            // Render menu borders
+            renderMenuBorders(shapeRenderer);
+            
+            // Restart batch for title and menu items
+            batch.begin();
+            
+            // Render menu title
+            renderMenuTitle(batch);
+            
+            // End batch to render dividers with ShapeRenderer
+            batch.end();
+            
+            // Render menu dividers
+            renderMenuDividers(shapeRenderer);
+            
+            // Restart batch for menu items
+            batch.begin();
+            
             String[] currentMenuItems = getCurrentMenuItems();
             for (int i = 0; i < currentMenuItems.length; i++) {
                 String menuItem = currentMenuItems[i];
@@ -936,7 +1094,14 @@ public class GameMenu implements LanguageChangeListener, FontChangeListener {
                 }
                 
                 float textX = menuX + 40;
-                float textY = menuY + MENU_HEIGHT - 40 - (i * 30);
+                // Start menu items lower to avoid overlapping with title (70 pixels from top instead of 40)
+                // Add extra spacing after dividers (items 0, 2, 4) to create larger gaps
+                float extraSpacing = 0;
+                if (i > 0) extraSpacing += 4; // Add 4px after item 0 (Player Profile divider)
+                if (i > 2) extraSpacing += 4; // Add 4px after item 2 (Load World divider)
+                if (i > 4) extraSpacing += 4; // Add 4px after item 4 (Story Mode divider)
+                
+                float textY = menuY + MENU_HEIGHT - 70 - (i * 30) - extraSpacing;
                 
                 // Display the menu item (disabled items are shown in gray color)
                 playerNameFont.draw(batch, menuItem, textX, textY);
@@ -998,16 +1163,16 @@ public class GameMenu implements LanguageChangeListener, FontChangeListener {
             openPlayerProfileMenu();
         } else if (selectedItem.equals(loc.getText("menu.player_name"))) {
             openNameDialog();
-        } else if (selectedItem.equals(loc.getText("menu.player_location"))) {
-            openPlayerLocationDialog();
-        } else if (selectedItem.equals(loc.getText("menu.controls"))) {
-            openControlsDialog();
         } else if (selectedItem.equals(loc.getText("menu.save_world"))) {
             openWorldSaveDialog();
         } else if (selectedItem.equals(loc.getText("menu.load_world"))) {
             openWorldLoadDialog();
         } else if (selectedItem.equals(loc.getText("menu.free_world"))) {
             activateFreeWorld();
+        } else if (selectedItem.equals(loc.getText("menu.story_mode"))) {
+            // Story Mode placeholder - no action taken
+            // This menu entry is reserved for future story mode functionality
+            System.out.println("Story Mode selected (placeholder - no action)");
         } else if (selectedItem.equals(loc.getText("menu.multiplayer"))) {
             openMultiplayerMenu();
         } else if (selectedItem.equals(loc.getText("menu.disconnect"))) {
@@ -1078,19 +1243,42 @@ public class GameMenu implements LanguageChangeListener, FontChangeListener {
     }
     
     /**
-     * Opens the player location dialog.
+     * Opens the player location dialog from main menu.
      */
     private void openPlayerLocationDialog() {
+        playerLocationDialogSource = DialogSource.MAIN_MENU;
         isOpen = false; // Close main menu
         PlayerConfig config = PlayerConfig.load();
         playerLocationDialog.show(player, compass, config);
     }
     
     /**
-     * Opens the controls dialog.
+     * Opens the player location dialog from player profile menu.
+     */
+    private void openPlayerLocationDialogFromProfile() {
+        playerLocationDialogSource = DialogSource.PLAYER_PROFILE;
+        dialogOpenedFromProfile = true;
+        isOpen = false; // Ensure main menu is closed
+        PlayerConfig config = PlayerConfig.load();
+        playerLocationDialog.show(player, compass, config);
+    }
+    
+    /**
+     * Opens the controls dialog from main menu.
      */
     private void openControlsDialog() {
+        controlsDialogSource = DialogSource.MAIN_MENU;
         isOpen = false; // Close main menu
+        controlsDialog.show();
+    }
+    
+    /**
+     * Opens the controls dialog from player profile menu.
+     */
+    private void openControlsDialogFromProfile() {
+        controlsDialogSource = DialogSource.PLAYER_PROFILE;
+        dialogOpenedFromProfile = true;
+        isOpen = false; // Ensure main menu is closed
         controlsDialog.show();
     }
     
@@ -1115,6 +1303,7 @@ public class GameMenu implements LanguageChangeListener, FontChangeListener {
             startupFrameCounter++;
             // Wait 3 frames before showing controls to allow world to load
             if (startupFrameCounter >= 3) {
+                controlsDialogSource = DialogSource.STARTUP;
                 controlsDialog.show();
                 hasShownControlsOnStartup = true;
                 shouldShowControlsOnStartup = false;
@@ -1127,8 +1316,46 @@ public class GameMenu implements LanguageChangeListener, FontChangeListener {
      */
     private void handlePlayerLocationDialogResult() {
         if (!playerLocationDialog.isVisible()) {
-            // Dialog was closed
-            isOpen = true; // Return to main menu
+            // Dialog was closed - return to appropriate location
+            switch (playerLocationDialogSource) {
+                case PLAYER_PROFILE:
+                    playerProfileMenu.open(); // Return to player profile menu
+                    break;
+                case MAIN_MENU:
+                    isOpen = true; // Return to main menu
+                    break;
+                case STARTUP:
+                case NONE:
+                default:
+                    // Return to game, don't open any menu
+                    break;
+            }
+            playerLocationDialogSource = DialogSource.NONE;
+            dialogOpenedFromProfile = false;
+        }
+    }
+    
+    /**
+     * Handles the result of the controls dialog.
+     */
+    private void handleControlsDialogResult() {
+        if (!controlsDialog.isVisible()) {
+            // Dialog was closed - return to appropriate location
+            switch (controlsDialogSource) {
+                case PLAYER_PROFILE:
+                    playerProfileMenu.open(); // Return to player profile menu
+                    break;
+                case MAIN_MENU:
+                    isOpen = true; // Return to main menu
+                    break;
+                case STARTUP:
+                case NONE:
+                default:
+                    // Return to game, don't open any menu
+                    break;
+            }
+            controlsDialogSource = DialogSource.NONE;
+            dialogOpenedFromProfile = false;
         }
     }
     
@@ -1512,23 +1739,29 @@ public class GameMenu implements LanguageChangeListener, FontChangeListener {
             playerProfileMenu.close();
             nameDialogFromProfile = true; // Track that we came from player profile
             openNameDialog();
-        } else if (selectedIndex == 1) { // Choose Character
+        } else if (selectedIndex == 1) { // Player Controls
+            playerProfileMenu.close();
+            openControlsDialogFromProfile();
+        } else if (selectedIndex == 2) { // Player Location
+            playerProfileMenu.close();
+            openPlayerLocationDialogFromProfile();
+        } else if (selectedIndex == 3) { // Choose Character
             // Character selection is handled by PlayerProfileMenu itself
             // Do nothing here - the dialog opens from PlayerProfileMenu.handleMenuSelection()
-        } else if (selectedIndex == 2) { // Save Player
+        } else if (selectedIndex == 4) { // Save Player
             if (!FreeWorldManager.isFreeWorldActive()) {
                 savePlayerPosition();
                 showSaveNotification = true;
                 saveNotificationTimer = SAVE_NOTIFICATION_DURATION;
             }
             // Stay in Player Profile menu
-        } else if (selectedIndex == 3) { // Language
-            playerProfileMenu.close();
-            openLanguageDialog();
-        } else if (selectedIndex == 4) { // Menu Font
+        } else if (selectedIndex == 5) { // Menu Font
             playerProfileMenu.close();
             openFontSelectionDialog();
-        } else if (selectedIndex == 5) { // Back
+        } else if (selectedIndex == 6) { // Language
+            playerProfileMenu.close();
+            openLanguageDialog();
+        } else if (selectedIndex == 7) { // Back
             playerProfileMenu.close();
             isOpen = true; // Return to main menu
         }
