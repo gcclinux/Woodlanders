@@ -19,7 +19,7 @@ public class InventoryRenderer {
     private Texture bananaIcon;
     private Texture bambooSaplingIcon;
     private Texture bambooStackIcon;
-    private Texture babyTreeIcon;
+    private Texture treeSaplingIcon;
     private Texture woodStackIcon;
     private Texture pebbleIcon;
     private Texture palmFiberIcon;
@@ -78,7 +78,7 @@ public class InventoryRenderer {
         bambooStackIcon = extractIconFromSpriteSheet(128, 128, 64, 64);
         
         // Load baby tree icon (384, 128, 64x64)
-        babyTreeIcon = extractIconFromSpriteSheet(384, 128, 64, 64);
+        treeSaplingIcon = extractIconFromSpriteSheet(384, 128, 64, 64);
         
         // Load wood stack icon (256, 128, 64x64)
         woodStackIcon = extractIconFromSpriteSheet(256, 128, 64, 64);
@@ -185,12 +185,12 @@ public class InventoryRenderer {
             batch.draw(slotBorder, x, slotY, SLOT_SIZE, SLOT_SIZE);
         }
         
-        // Render slots with icons and counts in order: Apple, Banana, BambooSapling, BambooStack, BabyTree, WoodStack, Pebble, PalmFiber
+        // Render slots with icons and counts in order: Apple, Banana, BambooSapling, BambooStack, TreeSapling, WoodStack, Pebble, PalmFiber
         renderSlot(batch, appleIcon, inventory.getAppleCount(), slotX, slotY, selectedSlot == 0);
         renderSlot(batch, bananaIcon, inventory.getBananaCount(), slotX + (SLOT_SIZE + SLOT_SPACING), slotY, selectedSlot == 1);
         renderSlot(batch, bambooSaplingIcon, inventory.getBambooSaplingCount(), slotX + 2 * (SLOT_SIZE + SLOT_SPACING), slotY, selectedSlot == 2);
         renderSlot(batch, bambooStackIcon, inventory.getBambooStackCount(), slotX + 3 * (SLOT_SIZE + SLOT_SPACING), slotY, selectedSlot == 3);
-        renderSlot(batch, babyTreeIcon, inventory.getBabyTreeCount(), slotX + 4 * (SLOT_SIZE + SLOT_SPACING), slotY, selectedSlot == 4);
+        renderSlot(batch, treeSaplingIcon, inventory.getTreeSaplingCount(), slotX + 4 * (SLOT_SIZE + SLOT_SPACING), slotY, selectedSlot == 4);
         renderSlot(batch, woodStackIcon, inventory.getWoodStackCount(), slotX + 5 * (SLOT_SIZE + SLOT_SPACING), slotY, selectedSlot == 5);
         renderSlot(batch, pebbleIcon, inventory.getPebbleCount(), slotX + 6 * (SLOT_SIZE + SLOT_SPACING), slotY, selectedSlot == 6);
         renderSlot(batch, palmFiberIcon, inventory.getPalmFiberCount(), slotX + 7 * (SLOT_SIZE + SLOT_SPACING), slotY, selectedSlot == 7);
@@ -264,7 +264,7 @@ public class InventoryRenderer {
         if (bananaIcon != null) bananaIcon.dispose();
         if (bambooSaplingIcon != null) bambooSaplingIcon.dispose();
         if (bambooStackIcon != null) bambooStackIcon.dispose();
-        if (babyTreeIcon != null) babyTreeIcon.dispose();
+        if (treeSaplingIcon != null) treeSaplingIcon.dispose();
         if (woodStackIcon != null) woodStackIcon.dispose();
         if (pebbleIcon != null) pebbleIcon.dispose();
         if (palmFiberIcon != null) palmFiberIcon.dispose();

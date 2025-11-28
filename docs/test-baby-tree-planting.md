@@ -1,4 +1,4 @@
-# BabyTree Planting System Test Plan
+# TreeSapling Planting System Test Plan
 
 ## Test Implementation Status
 
@@ -9,7 +9,7 @@
 
 ✅ **Phase 2: Player Integration**
 - Player class updated with tree planting logic
-- Inventory slot 4 (BabyTree) planting support added
+- Inventory slot 4 (TreeSapling) planting support added
 - Biome validation for grass tiles implemented
 
 ✅ **Phase 3: Game Integration**
@@ -36,9 +36,9 @@
 
 ### Singleplayer Testing
 1. **Basic Planting**
-   - [ ] Collect BabyTree items from destroyed SmallTrees
-   - [ ] Select BabyTree (slot 4) to activate targeting
-   - [ ] Plant BabyTree on grass biome using spacebar or P key
+   - [ ] Collect TreeSapling items from destroyed SmallTrees
+   - [ ] Select TreeSapling (slot 4) to activate targeting
+   - [ ] Plant TreeSapling on grass biome using spacebar or P key
    - [ ] Verify inventory count decreases
    - [ ] Verify PlantedTree appears at target location
 
@@ -48,12 +48,12 @@
    - [ ] Verify SmallTree can be attacked and destroyed
 
 3. **Biome Validation**
-   - [ ] Attempt to plant BabyTree on sand biome (should fail)
+   - [ ] Attempt to plant TreeSapling on sand biome (should fail)
    - [ ] Verify targeting indicator shows invalid on sand
    - [ ] Verify planting only works on grass biomes
 
 4. **World Persistence**
-   - [ ] Plant several BabyTrees at different growth stages
+   - [ ] Plant several TreeSaplings at different growth stages
    - [ ] Save world
    - [ ] Load world
    - [ ] Verify PlantedTrees are restored with correct growth timers
@@ -61,23 +61,23 @@
 ### Multiplayer Testing
 1. **Network Synchronization**
    - [ ] Host server and connect client
-   - [ ] Plant BabyTree on host, verify it appears on client
-   - [ ] Plant BabyTree on client, verify it appears on host
+   - [ ] Plant TreeSapling on host, verify it appears on client
+   - [ ] Plant TreeSapling on client, verify it appears on host
    - [ ] Verify transformation synchronizes across clients
 
 2. **Inventory Synchronization**
-   - [ ] Verify BabyTree count decreases on both clients when planted
+   - [ ] Verify TreeSapling count decreases on both clients when planted
    - [ ] Verify inventory updates are synchronized
 
 ## Expected Behavior
 
 ### Planting Process
-1. Player selects BabyTree (slot 4) from inventory
+1. Player selects TreeSapling (slot 4) from inventory
 2. Targeting system activates with white indicator
 3. Player moves target to grass biome tile using WASD
 4. Target indicator shows white (valid) on grass, red (invalid) on sand
 5. Player presses spacebar or P to plant
-6. BabyTree count decreases by 1
+6. TreeSapling count decreases by 1
 7. PlantedTree appears at target location
 8. Targeting remains active for additional planting
 
@@ -85,7 +85,7 @@
 1. PlantedTree grows for exactly 120 seconds
 2. After 120 seconds, PlantedTree transforms into SmallTree
 3. SmallTree can be attacked and destroyed like normal trees
-4. SmallTree drops BabyTree and WoodStack items when destroyed
+4. SmallTree drops TreeSapling and WoodStack items when destroyed
 
 ### Multiplayer Behavior
 1. Tree planting is synchronized across all clients
@@ -96,7 +96,7 @@
 ## Success Criteria
 
 The implementation is successful if:
-- ✅ BabyTree items can be planted from inventory slot 4
+- ✅ TreeSapling items can be planted from inventory slot 4
 - ✅ Planting only works on grass biomes (not sand)
 - ✅ PlantedTrees grow for 120 seconds then transform to SmallTrees
 - ✅ Inventory count decreases when planting
@@ -107,11 +107,11 @@ The implementation is successful if:
 
 ## Implementation Complete
 
-All phases of the BabyTree planting system have been implemented following the same patterns as the existing BambooSapling system. The system supports:
+All phases of the TreeSapling planting system have been implemented following the same patterns as the existing BambooSapling system. The system supports:
 
 - **Grass Biome Planting**: Trees plant on grass (opposite of bamboo on sand)
 - **120-Second Growth**: Same duration as bamboo for consistency
-- **Inventory Integration**: Uses slot 4 for BabyTree items
+- **Inventory Integration**: Uses slot 4 for TreeSapling items
 - **Multiplayer Support**: Full network synchronization
 - **World Persistence**: Save/load with growth progress
 - **Targeting System**: Visual feedback and validation

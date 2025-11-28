@@ -110,8 +110,8 @@ public class PlantingTargetValidator implements TargetValidator {
         
         // Check baby tree (slot 4)
         if (selectedSlot == 4) {
-            int babyTreeCount = inventoryManager.getCurrentInventory().getBabyTreeCount();
-            return babyTreeCount > 0;
+            int treeSaplingCount = inventoryManager.getCurrentInventory().getTreeSaplingCount();
+            return treeSaplingCount > 0;
         }
         
         return false;

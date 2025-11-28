@@ -615,27 +615,27 @@ public class ClientConnection implements Runnable {
                 }
             } else if (tree.getType() == TreeType.SMALL) {
                 // Randomly choose drop pattern: 
-                // 33% chance: 2 BabyTree
+                // 33% chance: 2 TreeSapling
                 // 33% chance: 2 WoodStack
-                // 33% chance: 1 BabyTree + 1 WoodStack
+                // 33% chance: 1 TreeSapling + 1 WoodStack
                 float dropRoll = (float) Math.random();
                 
                 if (dropRoll < 0.33f) {
-                    // Drop 2 BabyTree
-                    String babyTreeId1 = UUID.randomUUID().toString();
-                    ItemState babyTree1 = new ItemState(babyTreeId1, ItemType.BABY_TREE, quantizedX, quantizedY, false);
-                    server.getWorldState().addOrUpdateItem(babyTree1);
+                    // Drop 2 TreeSapling
+                    String treeSaplingId1 = UUID.randomUUID().toString();
+                    ItemState treeSapling1 = new ItemState(treeSaplingId1, ItemType.BABY_TREE, quantizedX, quantizedY, false);
+                    server.getWorldState().addOrUpdateItem(treeSapling1);
                     
-                    ItemSpawnMessage babyTreeSpawnMsg1 = new ItemSpawnMessage("server", babyTreeId1, ItemType.BABY_TREE, quantizedX, quantizedY);
-                    server.broadcastToAll(babyTreeSpawnMsg1);
+                    ItemSpawnMessage treeSaplingSpawnMsg1 = new ItemSpawnMessage("server", treeSaplingId1, ItemType.BABY_TREE, quantizedX, quantizedY);
+                    server.broadcastToAll(treeSaplingSpawnMsg1);
                     
-                    String babyTreeId2 = UUID.randomUUID().toString();
-                    float babyTree2X = quantizePosition(tree.getX() + 8);
-                    ItemState babyTree2 = new ItemState(babyTreeId2, ItemType.BABY_TREE, babyTree2X, quantizedY, false);
-                    server.getWorldState().addOrUpdateItem(babyTree2);
+                    String treeSaplingId2 = UUID.randomUUID().toString();
+                    float treeSapling2X = quantizePosition(tree.getX() + 8);
+                    ItemState treeSapling2 = new ItemState(treeSaplingId2, ItemType.BABY_TREE, treeSapling2X, quantizedY, false);
+                    server.getWorldState().addOrUpdateItem(treeSapling2);
                     
-                    ItemSpawnMessage babyTreeSpawnMsg2 = new ItemSpawnMessage("server", babyTreeId2, ItemType.BABY_TREE, babyTree2X, quantizedY);
-                    server.broadcastToAll(babyTreeSpawnMsg2);
+                    ItemSpawnMessage treeSaplingSpawnMsg2 = new ItemSpawnMessage("server", treeSaplingId2, ItemType.BABY_TREE, treeSapling2X, quantizedY);
+                    server.broadcastToAll(treeSaplingSpawnMsg2);
                     
                     System.out.println("Items spawned: 2x BABY_TREE at (" + quantizedX + ", " + quantizedY + ")");
                 } else if (dropRoll < 0.66f) {
@@ -657,13 +657,13 @@ public class ClientConnection implements Runnable {
                     
                     System.out.println("Items spawned: 2x WOOD_STACK at (" + quantizedX + ", " + quantizedY + ")");
                 } else {
-                    // Drop 1 BabyTree + 1 WoodStack
-                    String babyTreeId = UUID.randomUUID().toString();
-                    ItemState babyTree = new ItemState(babyTreeId, ItemType.BABY_TREE, quantizedX, quantizedY, false);
-                    server.getWorldState().addOrUpdateItem(babyTree);
+                    // Drop 1 TreeSapling + 1 WoodStack
+                    String treeSaplingId = UUID.randomUUID().toString();
+                    ItemState treeSapling = new ItemState(treeSaplingId, ItemType.BABY_TREE, quantizedX, quantizedY, false);
+                    server.getWorldState().addOrUpdateItem(treeSapling);
                     
-                    ItemSpawnMessage babyTreeSpawnMsg = new ItemSpawnMessage("server", babyTreeId, ItemType.BABY_TREE, quantizedX, quantizedY);
-                    server.broadcastToAll(babyTreeSpawnMsg);
+                    ItemSpawnMessage treeSaplingSpawnMsg = new ItemSpawnMessage("server", treeSaplingId, ItemType.BABY_TREE, quantizedX, quantizedY);
+                    server.broadcastToAll(treeSaplingSpawnMsg);
                     
                     String woodStackId = UUID.randomUUID().toString();
                     float woodStackX = quantizePosition(tree.getX() + 8);
@@ -802,7 +802,7 @@ public class ClientConnection implements Runnable {
                 playerState.setBambooStackCount(playerState.getBambooStackCount() + 1);
                 break;
             case BABY_TREE:
-                playerState.setBabyTreeCount(playerState.getBabyTreeCount() + 1);
+                playerState.setTreeSaplingCount(playerState.getTreeSaplingCount() + 1);
                 break;
             case WOOD_STACK:
                 playerState.setWoodStackCount(playerState.getWoodStackCount() + 1);
@@ -828,7 +828,7 @@ public class ClientConnection implements Runnable {
             playerState.getBananaCount(),
             playerState.getBambooSaplingCount(),
             playerState.getBambooStackCount(),
-            playerState.getBabyTreeCount(),
+            playerState.getTreeSaplingCount(),
             playerState.getWoodStackCount(),
             playerState.getPebbleCount(),
             playerState.getPalmFiberCount()
@@ -990,7 +990,7 @@ public class ClientConnection implements Runnable {
             playerState.getBananaCount(),
             playerState.getBambooSaplingCount(),
             playerState.getBambooStackCount(),
-            playerState.getBabyTreeCount(),
+            playerState.getTreeSaplingCount(),
             playerState.getWoodStackCount(),
             playerState.getPebbleCount(),
             playerState.getPalmFiberCount()
@@ -1407,7 +1407,7 @@ public class ClientConnection implements Runnable {
             !isValidInventoryCount(message.getBananaCount()) ||
             !isValidInventoryCount(message.getBambooSaplingCount()) ||
             !isValidInventoryCount(message.getBambooStackCount()) ||
-            !isValidInventoryCount(message.getBabyTreeCount()) ||
+            !isValidInventoryCount(message.getTreeSaplingCount()) ||
             !isValidInventoryCount(message.getWoodStackCount()) ||
             !isValidInventoryCount(message.getPebbleCount()) ||
             !isValidInventoryCount(message.getPalmFiberCount())) {
@@ -1421,7 +1421,7 @@ public class ClientConnection implements Runnable {
         playerState.setBananaCount(message.getBananaCount());
         playerState.setBambooSaplingCount(message.getBambooSaplingCount());
         playerState.setBambooStackCount(message.getBambooStackCount());
-        playerState.setBabyTreeCount(message.getBabyTreeCount());
+        playerState.setTreeSaplingCount(message.getTreeSaplingCount());
         playerState.setWoodStackCount(message.getWoodStackCount());
         playerState.setPebbleCount(message.getPebbleCount());
         playerState.setPalmFiberCount(message.getPalmFiberCount());
@@ -1434,7 +1434,7 @@ public class ClientConnection implements Runnable {
                          ", Bananas=" + message.getBananaCount() +
                          ", BambooSapling=" + message.getBambooSaplingCount() +
                          ", BambooStack=" + message.getBambooStackCount() +
-                         ", BabyTree=" + message.getBabyTreeCount() +
+                         ", TreeSapling=" + message.getTreeSaplingCount() +
                          ", WoodStack=" + message.getWoodStackCount() +
                          ", Pebbles=" + message.getPebbleCount() +
                          ", PalmFiber=" + message.getPalmFiberCount());
@@ -1461,7 +1461,7 @@ public class ClientConnection implements Runnable {
             playerState.getBananaCount(),
             playerState.getBambooSaplingCount(),
             playerState.getBambooStackCount(),
-            playerState.getBabyTreeCount(),
+            playerState.getTreeSaplingCount(),
             playerState.getWoodStackCount(),
             playerState.getPebbleCount(),
             playerState.getPalmFiberCount()

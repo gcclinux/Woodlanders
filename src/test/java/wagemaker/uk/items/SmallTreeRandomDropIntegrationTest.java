@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
  */
 public class SmallTreeRandomDropIntegrationTest {
     
-    private Map<String, MockBabyTree> babyTrees;
+    private Map<String, MockTreeSapling> treeSaplings;
     private Map<String, MockWoodStack> woodStacks;
     private Map<String, MockSmallTree> smallTrees;
     private Map<String, Boolean> clearedPositions;
@@ -32,7 +32,7 @@ public class SmallTreeRandomDropIntegrationTest {
     
     @BeforeEach
     public void setUp() {
-        babyTrees = new HashMap<>();
+        treeSaplings = new HashMap<>();
         woodStacks = new HashMap<>();
         smallTrees = new HashMap<>();
         clearedPositions = new HashMap<>();
@@ -79,13 +79,13 @@ public class SmallTreeRandomDropIntegrationTest {
     }
     
     /**
-     * Mock BabyTree class for testing without OpenGL context.
+     * Mock TreeSapling class for testing without OpenGL context.
      */
-    private static class MockBabyTree {
+    private static class MockTreeSapling {
         private float x, y;
         private final AtomicBoolean disposed = new AtomicBoolean(false);
         
-        public MockBabyTree(float x, float y) {
+        public MockTreeSapling(float x, float y) {
             this.x = x;
             this.y = y;
         }
@@ -183,16 +183,16 @@ public class SmallTreeRandomDropIntegrationTest {
             int dropType = random.nextInt(3); // Returns 0, 1, or 2
             
             switch (dropType) {
-                case 0: // 2x BabyTree
-                    babyTrees.put(treeKey + "-item1", new MockBabyTree(smallTree.getX(), smallTree.getY()));
-                    babyTrees.put(treeKey + "-item2", new MockBabyTree(smallTree.getX() + 8, smallTree.getY()));
+                case 0: // 2x TreeSapling
+                    treeSaplings.put(treeKey + "-item1", new MockTreeSapling(smallTree.getX(), smallTree.getY()));
+                    treeSaplings.put(treeKey + "-item2", new MockTreeSapling(smallTree.getX() + 8, smallTree.getY()));
                     break;
                 case 1: // 2x WoodStack
                     woodStacks.put(treeKey + "-item1", new MockWoodStack(smallTree.getX(), smallTree.getY()));
                     woodStacks.put(treeKey + "-item2", new MockWoodStack(smallTree.getX() + 8, smallTree.getY()));
                     break;
-                case 2: // 1x BabyTree + 1x WoodStack
-                    babyTrees.put(treeKey + "-item1", new MockBabyTree(smallTree.getX(), smallTree.getY()));
+                case 2: // 1x TreeSapling + 1x WoodStack
+                    treeSaplings.put(treeKey + "-item1", new MockTreeSapling(smallTree.getX(), smallTree.getY()));
                     woodStacks.put(treeKey + "-item2", new MockWoodStack(smallTree.getX() + 8, smallTree.getY()));
                     break;
             }
@@ -203,7 +203,7 @@ public class SmallTreeRandomDropIntegrationTest {
         }
         
         // Verify two items were spawned (total count should be 2)
-        int totalItems = babyTrees.size() + woodStacks.size();
+        int totalItems = treeSaplings.size() + woodStacks.size();
         assertEquals(2, totalItems, "Should have 2 items total");
         
         // Verify tree was removed
@@ -211,7 +211,7 @@ public class SmallTreeRandomDropIntegrationTest {
         assertTrue(clearedPositions.containsKey(treeKey), "Position should be marked as cleared");
         
         // Clean up
-        for (MockBabyTree item : babyTrees.values()) {
+        for (MockTreeSapling item : treeSaplings.values()) {
             item.dispose();
         }
         for (MockWoodStack item : woodStacks.values()) {
@@ -226,7 +226,7 @@ public class SmallTreeRandomDropIntegrationTest {
      */
     @Test
     public void testAllThreeDropCombinationsAppear() {
-        boolean foundTwoBabyTrees = false;
+        boolean foundTwoTreeSaplings = false;
         boolean foundTwoWoodStacks = false;
         boolean foundMixed = false;
         
@@ -234,7 +234,7 @@ public class SmallTreeRandomDropIntegrationTest {
         Random testRandom = new Random(12345);
         
         for (int i = 0; i < 30; i++) {
-            babyTrees.clear();
+            treeSaplings.clear();
             woodStacks.clear();
             
             float treeX = 100.0f + (i * 100);
@@ -251,24 +251,24 @@ public class SmallTreeRandomDropIntegrationTest {
             int dropType = testRandom.nextInt(3);
             
             switch (dropType) {
-                case 0: // 2x BabyTree
-                    babyTrees.put(treeKey + "-item1", new MockBabyTree(smallTree.getX(), smallTree.getY()));
-                    babyTrees.put(treeKey + "-item2", new MockBabyTree(smallTree.getX() + 8, smallTree.getY()));
-                    if (babyTrees.size() == 2 && woodStacks.size() == 0) {
-                        foundTwoBabyTrees = true;
+                case 0: // 2x TreeSapling
+                    treeSaplings.put(treeKey + "-item1", new MockTreeSapling(smallTree.getX(), smallTree.getY()));
+                    treeSaplings.put(treeKey + "-item2", new MockTreeSapling(smallTree.getX() + 8, smallTree.getY()));
+                    if (treeSaplings.size() == 2 && woodStacks.size() == 0) {
+                        foundTwoTreeSaplings = true;
                     }
                     break;
                 case 1: // 2x WoodStack
                     woodStacks.put(treeKey + "-item1", new MockWoodStack(smallTree.getX(), smallTree.getY()));
                     woodStacks.put(treeKey + "-item2", new MockWoodStack(smallTree.getX() + 8, smallTree.getY()));
-                    if (woodStacks.size() == 2 && babyTrees.size() == 0) {
+                    if (woodStacks.size() == 2 && treeSaplings.size() == 0) {
                         foundTwoWoodStacks = true;
                     }
                     break;
-                case 2: // 1x BabyTree + 1x WoodStack
-                    babyTrees.put(treeKey + "-item1", new MockBabyTree(smallTree.getX(), smallTree.getY()));
+                case 2: // 1x TreeSapling + 1x WoodStack
+                    treeSaplings.put(treeKey + "-item1", new MockTreeSapling(smallTree.getX(), smallTree.getY()));
                     woodStacks.put(treeKey + "-item2", new MockWoodStack(smallTree.getX() + 8, smallTree.getY()));
-                    if (babyTrees.size() == 1 && woodStacks.size() == 1) {
+                    if (treeSaplings.size() == 1 && woodStacks.size() == 1) {
                         foundMixed = true;
                     }
                     break;
@@ -277,7 +277,7 @@ public class SmallTreeRandomDropIntegrationTest {
             smallTree.dispose();
             
             // Clean up items
-            for (MockBabyTree item : babyTrees.values()) {
+            for (MockTreeSapling item : treeSaplings.values()) {
                 item.dispose();
             }
             for (MockWoodStack item : woodStacks.values()) {
@@ -286,9 +286,9 @@ public class SmallTreeRandomDropIntegrationTest {
         }
         
         // Verify all three combinations appeared
-        assertTrue(foundTwoBabyTrees, "Should find 2x BabyTree combination");
+        assertTrue(foundTwoTreeSaplings, "Should find 2x TreeSapling combination");
         assertTrue(foundTwoWoodStacks, "Should find 2x WoodStack combination");
-        assertTrue(foundMixed, "Should find 1x BabyTree + 1x WoodStack combination");
+        assertTrue(foundMixed, "Should find 1x TreeSapling + 1x WoodStack combination");
     }
     
     /**
@@ -309,12 +309,12 @@ public class SmallTreeRandomDropIntegrationTest {
             smallTree.attack();
         }
         
-        // Test case 0: 2x BabyTree
-        babyTrees.put(treeKey + "-item1", new MockBabyTree(smallTree.getX(), smallTree.getY()));
-        babyTrees.put(treeKey + "-item2", new MockBabyTree(smallTree.getX() + 8, smallTree.getY()));
+        // Test case 0: 2x TreeSapling
+        treeSaplings.put(treeKey + "-item1", new MockTreeSapling(smallTree.getX(), smallTree.getY()));
+        treeSaplings.put(treeKey + "-item2", new MockTreeSapling(smallTree.getX() + 8, smallTree.getY()));
         
-        MockBabyTree item1 = babyTrees.get(treeKey + "-item1");
-        MockBabyTree item2 = babyTrees.get(treeKey + "-item2");
+        MockTreeSapling item1 = treeSaplings.get(treeKey + "-item1");
+        MockTreeSapling item2 = treeSaplings.get(treeKey + "-item2");
         
         // Verify horizontal spacing
         float horizontalDistance = item2.getX() - item1.getX();
@@ -332,60 +332,60 @@ public class SmallTreeRandomDropIntegrationTest {
     /**
      * Test that items use correct texture dimensions and render at 32x32 pixels.
      * 
-     * Requirement 2.4: "THE MyGdxGame Class SHALL render BabyTree items at 32x32 pixels on screen"
+     * Requirement 2.4: "THE MyGdxGame Class SHALL render TreeSapling items at 32x32 pixels on screen"
      * Requirement 3.2: "THE MyGdxGame Class SHALL render WoodStack items at 32x32 pixels on screen"
      */
     @Test
     public void testItemTexturesAndRenderSize() {
         // Create items
-        MockBabyTree babyTree = new MockBabyTree(0, 0);
+        MockTreeSapling treeSapling = new MockTreeSapling(0, 0);
         MockWoodStack woodStack = new MockWoodStack(8, 0);
         
         // Verify texture dimensions (source is 64x64, but rendered at 32x32)
-        assertEquals(64, babyTree.getTextureWidth(), "BabyTree texture width should be 64");
-        assertEquals(64, babyTree.getTextureHeight(), "BabyTree texture height should be 64");
+        assertEquals(64, treeSapling.getTextureWidth(), "TreeSapling texture width should be 64");
+        assertEquals(64, treeSapling.getTextureHeight(), "TreeSapling texture height should be 64");
         assertEquals(64, woodStack.getTextureWidth(), "WoodStack texture width should be 64");
         assertEquals(64, woodStack.getTextureHeight(), "WoodStack texture height should be 64");
         
-        // Note: Render size of 32x32 is enforced in MyGdxGame.drawBabyTrees() and drawWoodStacks()
+        // Note: Render size of 32x32 is enforced in MyGdxGame.drawTreeSaplings() and drawWoodStacks()
         // This test verifies the texture source dimensions are correct
         
         // Clean up
-        babyTree.dispose();
+        treeSapling.dispose();
         woodStack.dispose();
     }
     
     /**
-     * Test pickup detection for BabyTree items.
+     * Test pickup detection for TreeSapling items.
      * 
-     * Requirement 4.1: "WHEN the player's collision box overlaps with a BabyTree item, 
-     * THE Player Class SHALL remove the BabyTree from the game world"
+     * Requirement 4.1: "WHEN the player's collision box overlaps with a TreeSapling item, 
+     * THE Player Class SHALL remove the TreeSapling from the game world"
      */
     @Test
-    public void testBabyTreePickup() {
-        // Create BabyTree at position (100, 100)
+    public void testTreeSaplingPickup() {
+        // Create TreeSapling at position (100, 100)
         String itemKey = "100,100-item1";
-        MockBabyTree babyTree = new MockBabyTree(100, 100);
-        babyTrees.put(itemKey, babyTree);
+        MockTreeSapling treeSapling = new MockTreeSapling(100, 100);
+        treeSaplings.put(itemKey, treeSapling);
         
         // Verify item exists
-        assertEquals(1, babyTrees.size(), "Should have 1 BabyTree before pickup");
-        assertNotNull(babyTrees.get(itemKey), "BabyTree should exist");
+        assertEquals(1, treeSaplings.size(), "Should have 1 TreeSapling before pickup");
+        assertNotNull(treeSaplings.get(itemKey), "TreeSapling should exist");
         
         // Simulate pickup (player walks over item)
         AtomicBoolean pickedUp = new AtomicBoolean(false);
         
-        if (babyTrees.containsKey(itemKey)) {
-            MockBabyTree item = babyTrees.get(itemKey);
+        if (treeSaplings.containsKey(itemKey)) {
+            MockTreeSapling item = treeSaplings.get(itemKey);
             item.dispose();
-            babyTrees.remove(itemKey);
+            treeSaplings.remove(itemKey);
             pickedUp.set(true);
         }
         
         // Verify pickup
         assertTrue(pickedUp.get(), "Item should be picked up");
-        assertEquals(0, babyTrees.size(), "BabyTree should be removed from map");
-        assertFalse(babyTrees.containsKey(itemKey), "BabyTree key should not exist");
+        assertEquals(0, treeSaplings.size(), "TreeSapling should be removed from map");
+        assertFalse(treeSaplings.containsKey(itemKey), "TreeSapling key should not exist");
     }
     
     /**
@@ -430,22 +430,22 @@ public class SmallTreeRandomDropIntegrationTest {
         String treeKey = "200,200";
         
         // Create both items (mixed combination)
-        MockBabyTree babyTree = new MockBabyTree(200, 200);
+        MockTreeSapling treeSapling = new MockTreeSapling(200, 200);
         MockWoodStack woodStack = new MockWoodStack(208, 200);
         
-        babyTrees.put(treeKey + "-item1", babyTree);
+        treeSaplings.put(treeKey + "-item1", treeSapling);
         woodStacks.put(treeKey + "-item2", woodStack);
         
         // Verify both items exist
-        assertEquals(1, babyTrees.size(), "Should have 1 BabyTree");
+        assertEquals(1, treeSaplings.size(), "Should have 1 TreeSapling");
         assertEquals(1, woodStacks.size(), "Should have 1 WoodStack");
         
-        // Pick up BabyTree first
-        MockBabyTree tree = babyTrees.remove(treeKey + "-item1");
+        // Pick up TreeSapling first
+        MockTreeSapling tree = treeSaplings.remove(treeKey + "-item1");
         tree.dispose();
         
-        // Verify BabyTree removed but WoodStack still exists
-        assertEquals(0, babyTrees.size(), "BabyTree should be removed");
+        // Verify TreeSapling removed but WoodStack still exists
+        assertEquals(0, treeSaplings.size(), "TreeSapling should be removed");
         assertEquals(1, woodStacks.size(), "WoodStack should still exist");
         
         // Pick up WoodStack
@@ -453,7 +453,7 @@ public class SmallTreeRandomDropIntegrationTest {
         stack.dispose();
         
         // Verify both items removed
-        assertEquals(0, babyTrees.size(), "BabyTree should be removed");
+        assertEquals(0, treeSaplings.size(), "TreeSapling should be removed");
         assertEquals(0, woodStacks.size(), "WoodStack should be removed");
     }
     
@@ -483,16 +483,16 @@ public class SmallTreeRandomDropIntegrationTest {
             int dropType = testRandom.nextInt(3);
             
             switch (dropType) {
-                case 0: // 2x BabyTree
-                    babyTrees.put(treeKey + "-item1", new MockBabyTree(smallTree.getX(), smallTree.getY()));
-                    babyTrees.put(treeKey + "-item2", new MockBabyTree(smallTree.getX() + 8, smallTree.getY()));
+                case 0: // 2x TreeSapling
+                    treeSaplings.put(treeKey + "-item1", new MockTreeSapling(smallTree.getX(), smallTree.getY()));
+                    treeSaplings.put(treeKey + "-item2", new MockTreeSapling(smallTree.getX() + 8, smallTree.getY()));
                     break;
                 case 1: // 2x WoodStack
                     woodStacks.put(treeKey + "-item1", new MockWoodStack(smallTree.getX(), smallTree.getY()));
                     woodStacks.put(treeKey + "-item2", new MockWoodStack(smallTree.getX() + 8, smallTree.getY()));
                     break;
-                case 2: // 1x BabyTree + 1x WoodStack
-                    babyTrees.put(treeKey + "-item1", new MockBabyTree(smallTree.getX(), smallTree.getY()));
+                case 2: // 1x TreeSapling + 1x WoodStack
+                    treeSaplings.put(treeKey + "-item1", new MockTreeSapling(smallTree.getX(), smallTree.getY()));
                     woodStacks.put(treeKey + "-item2", new MockWoodStack(smallTree.getX() + 8, smallTree.getY()));
                     break;
             }
@@ -501,11 +501,11 @@ public class SmallTreeRandomDropIntegrationTest {
         }
         
         // Verify correct total number of items spawned (5 trees × 2 items = 10 items)
-        int totalItems = babyTrees.size() + woodStacks.size();
+        int totalItems = treeSaplings.size() + woodStacks.size();
         assertEquals(10, totalItems, "Should have 10 items total from 5 trees");
         
         // Clean up
-        for (MockBabyTree item : babyTrees.values()) {
+        for (MockTreeSapling item : treeSaplings.values()) {
             item.dispose();
         }
         for (MockWoodStack item : woodStacks.values()) {
@@ -536,7 +536,7 @@ public class SmallTreeRandomDropIntegrationTest {
         String item1Key = treeKey + "-item1";
         String item2Key = treeKey + "-item2";
         
-        babyTrees.put(item1Key, new MockBabyTree(smallTree.getX(), smallTree.getY()));
+        treeSaplings.put(item1Key, new MockTreeSapling(smallTree.getX(), smallTree.getY()));
         woodStacks.put(item2Key, new MockWoodStack(smallTree.getX() + 8, smallTree.getY()));
         
         // Verify keys are correct
@@ -547,11 +547,11 @@ public class SmallTreeRandomDropIntegrationTest {
         assertFalse(item1Key.equals(item2Key), "Item keys should be unique");
         
         // Verify items can be retrieved by key
-        assertNotNull(babyTrees.get(item1Key), "BabyTree should be retrievable by key");
+        assertNotNull(treeSaplings.get(item1Key), "TreeSapling should be retrievable by key");
         assertNotNull(woodStacks.get(item2Key), "WoodStack should be retrievable by key");
         
         // Clean up
-        babyTrees.get(item1Key).dispose();
+        treeSaplings.get(item1Key).dispose();
         woodStacks.get(item2Key).dispose();
         smallTree.dispose();
     }
@@ -562,7 +562,7 @@ public class SmallTreeRandomDropIntegrationTest {
      */
     @Test
     public void testProbabilityDistribution() {
-        int twoBabyTreeCount = 0;
+        int twoTreeSaplingCount = 0;
         int twoWoodStackCount = 0;
         int mixedCount = 0;
         int totalTrees = 300;
@@ -574,7 +574,7 @@ public class SmallTreeRandomDropIntegrationTest {
             
             switch (dropType) {
                 case 0:
-                    twoBabyTreeCount++;
+                    twoTreeSaplingCount++;
                     break;
                 case 1:
                     twoWoodStackCount++;
@@ -587,15 +587,15 @@ public class SmallTreeRandomDropIntegrationTest {
         
         // Each combination should appear roughly 100 times (33.33% of 300)
         // Allow 20% variance (80-120 range)
-        assertTrue(twoBabyTreeCount >= 80 && twoBabyTreeCount <= 120, 
-            "2x BabyTree should appear ~100 times, got: " + twoBabyTreeCount);
+        assertTrue(twoTreeSaplingCount >= 80 && twoTreeSaplingCount <= 120, 
+            "2x TreeSapling should appear ~100 times, got: " + twoTreeSaplingCount);
         assertTrue(twoWoodStackCount >= 80 && twoWoodStackCount <= 120, 
             "2x WoodStack should appear ~100 times, got: " + twoWoodStackCount);
         assertTrue(mixedCount >= 80 && mixedCount <= 120, 
             "Mixed combination should appear ~100 times, got: " + mixedCount);
         
         // Verify total
-        assertEquals(totalTrees, twoBabyTreeCount + twoWoodStackCount + mixedCount, 
+        assertEquals(totalTrees, twoTreeSaplingCount + twoWoodStackCount + mixedCount, 
             "Total should equal number of trees");
     }
 }

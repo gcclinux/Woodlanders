@@ -12,7 +12,7 @@ public class InventorySyncMessage extends NetworkMessage {
     private int bananaCount;
     private int bambooSaplingCount;
     private int bambooStackCount;
-    private int babyTreeCount;
+    private int treeSaplingCount;
     private int woodStackCount;
     private int pebbleCount;
     private int palmFiberCount;
@@ -24,14 +24,14 @@ public class InventorySyncMessage extends NetworkMessage {
     public InventorySyncMessage(String senderId, String playerId, 
                                  int appleCount, int bananaCount, 
                                  int bambooSaplingCount, int bambooStackCount, 
-                                 int babyTreeCount, int woodStackCount, int pebbleCount, int palmFiberCount) {
+                                 int treeSaplingCount, int woodStackCount, int pebbleCount, int palmFiberCount) {
         super(senderId);
         this.playerId = playerId;
         this.appleCount = appleCount;
         this.bananaCount = bananaCount;
         this.bambooSaplingCount = bambooSaplingCount;
         this.bambooStackCount = bambooStackCount;
-        this.babyTreeCount = babyTreeCount;
+        this.treeSaplingCount = treeSaplingCount;
         this.woodStackCount = woodStackCount;
         this.pebbleCount = pebbleCount;
         this.palmFiberCount = palmFiberCount;
@@ -62,8 +62,8 @@ public class InventorySyncMessage extends NetworkMessage {
         return bambooStackCount;
     }
     
-    public int getBabyTreeCount() {
-        return babyTreeCount;
+    public int getTreeSaplingCount() {
+        return treeSaplingCount;
     }
     
     public int getWoodStackCount() {

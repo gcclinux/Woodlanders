@@ -1,14 +1,14 @@
-# BabyTree Planting System Implementation Plan
+# TreeSapling Planting System Implementation Plan
 
 ## Overview
-Implement a planting system for BabyTree items that follows the same pattern as the existing BambooSapling planting system. Players will be able to plant BabyTree items from their inventory, which will grow into SmallTree instances after 120 seconds.
+Implement a planting system for TreeSapling items that follows the same pattern as the existing BambooSapling planting system. Players will be able to plant TreeSapling items from their inventory, which will grow into SmallTree instances after 120 seconds.
 
 ## Requirements Analysis
 
 ### Core Functionality
-1. **Planting Mechanics**: Plant BabyTree items using the existing targeting system
-2. **Growth System**: BabyTree grows into SmallTree after 120 seconds (same duration as bamboo)
-3. **Inventory Integration**: Reduce BabyTree count when planted
+1. **Planting Mechanics**: Plant TreeSapling items using the existing targeting system
+2. **Growth System**: TreeSapling grows into SmallTree after 120 seconds (same duration as bamboo)
+3. **Inventory Integration**: Reduce TreeSapling count when planted
 4. **World Persistence**: Save/load planted trees in world saves
 5. **Multiplayer Support**: Synchronize planting and growth across clients
 6. **Biome Restrictions**: Plant on grass biomes (opposite of bamboo which plants on sand)
@@ -70,7 +70,7 @@ Implement a planting system for BabyTree items that follows the same pattern as 
 - Biome validation for tree planting (grass only)
 
 **Modified Methods**:
-- `handleSpacebarAction()` - Add tree planting when BabyTree selected
+- `handleSpacebarAction()` - Add tree planting when TreeSapling selected
 - `setPlantedTrees()` - Setter for planted trees map
 
 #### 2.2 Update Targeting System
@@ -192,15 +192,15 @@ public boolean canPlantTree(float x, float y, BiomeManager biomeManager) {
 ### Inventory Integration
 ```java
 // In Player.handleSpacebarAction()
-if (selectedSlot == 5) { // BabyTree slot
+if (selectedSlot == 5) { // TreeSapling slot
     Inventory inventory = inventoryManager.getCurrentInventory();
-    if (inventory.getBabyTreeCount() > 0) {
+    if (inventory.getTreeSaplingCount() > 0) {
         // Validate grass biome
         if (plantingSystem.canPlantTree(targetX, targetY, biomeManager)) {
             // Plant the tree
             String plantedId = plantingSystem.plantTree(targetX, targetY, plantedTrees);
             if (plantedId != null) {
-                inventory.setBabyTreeCount(inventory.getBabyTreeCount() - 1);
+                inventory.setTreeSaplingCount(inventory.getTreeSaplingCount() - 1);
                 // Send network message if multiplayer
             }
         }
@@ -230,7 +230,7 @@ if (selectedSlot == 5) { // BabyTree slot
 ## Success Criteria
 
 ### Functional Requirements
-- ✅ BabyTree items can be planted from inventory
+- ✅ TreeSapling items can be planted from inventory
 - ✅ Planted trees grow into SmallTree after 120 seconds
 - ✅ Planting only works on grass biomes
 - ✅ Inventory count decreases when planting

@@ -53,7 +53,7 @@ Complete reference of all Java classes in the Woodlanders project, organized by 
 | **Apple** | Consumable apple item |
 | **Banana** | Consumable banana item |
 | **BambooSapling** | Plantable bamboo sapling item |
-| **BabyTree** | Plantable baby tree item |
+| **TreeSapling** | Plantable tree sapling item |
 | **BambooStack** | Resource bamboo stack item |
 | **WoodStack** | Resource wood stack item |
 | **PalmFiber** | Resource palm fiber item |

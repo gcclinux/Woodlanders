@@ -70,7 +70,7 @@ public class SmallTreeMultiplayerDropIntegrationTest {
      * Requirement 1.7: "WHERE the game is in multiplayer mode, THE Game System 
      * SHALL handle item spawning through the server's item spawn messaging system"
      * 
-     * Requirement 6.2: "WHEN a BabyTree is spawned in multiplayer mode, THE Game Server 
+     * Requirement 6.2: "WHEN a TreeSapling is spawned in multiplayer mode, THE Game Server 
      * SHALL broadcast an ItemSpawnMessage with type BABY_TREE"
      */
     @Test
@@ -198,7 +198,7 @@ public class SmallTreeMultiplayerDropIntegrationTest {
             (type1 == ItemType.BABY_TREE && type2 == ItemType.WOOD_STACK);
         
         assertTrue(validCombination, 
-                  "Items should be one of the three valid combinations: 2x BabyTree, 2x WoodStack, or 1x each");
+                  "Items should be one of the three valid combinations: 2x TreeSapling, 2x WoodStack, or 1x each");
         
         System.out.println("Drop combination: " + type1 + " + " + type2);
     }
@@ -207,8 +207,8 @@ public class SmallTreeMultiplayerDropIntegrationTest {
      * Test 2: Items are positioned correctly on all clients
      * Verifies that items are positioned 8 pixels apart and at the correct location.
      * 
-     * Requirement 6.4: "WHEN a client receives a BabyTree spawn message, THE Game Client 
-     * SHALL create a BabyTree instance at the specified position"
+     * Requirement 6.4: "WHEN a client receives a TreeSapling spawn message, THE Game Client 
+     * SHALL create a TreeSapling instance at the specified position"
      */
     @Test
     @Order(2)
@@ -317,11 +317,11 @@ public class SmallTreeMultiplayerDropIntegrationTest {
      * Test 3: Item pickup synchronization across clients
      * Verifies that when one client picks up an item, it's removed on all clients.
      * 
-     * Requirement 6.3: "WHEN a BabyTree is picked up in multiplayer mode, THE Game Server 
-     * SHALL broadcast an ItemPickupMessage for the BabyTree"
+     * Requirement 6.3: "WHEN a TreeSapling is picked up in multiplayer mode, THE Game Server 
+     * SHALL broadcast an ItemPickupMessage for the TreeSapling"
      * 
-     * Requirement 6.5: "WHEN a client receives a BabyTree pickup message, THE Game Client 
-     * SHALL remove the BabyTree from the local collection"
+     * Requirement 6.5: "WHEN a client receives a TreeSapling pickup message, THE Game Client 
+     * SHALL remove the TreeSapling from the local collection"
      */
     @Test
     @Order(3)
@@ -601,7 +601,7 @@ public class SmallTreeMultiplayerDropIntegrationTest {
                         
                         String combination;
                         if (type1 == ItemType.BABY_TREE && type2 == ItemType.BABY_TREE) {
-                            combination = "2xBabyTree";
+                            combination = "2xTreeSapling";
                         } else if (type1 == ItemType.WOOD_STACK && type2 == ItemType.WOOD_STACK) {
                             combination = "2xWoodStack";
                         } else {
@@ -664,8 +664,8 @@ public class SmallTreeMultiplayerDropIntegrationTest {
         
         // If we have all 3, verify they're the expected ones
         if (combinationsFound == 3) {
-            assertTrue(observedCombinations.contains("2xBabyTree"), 
-                      "Should observe 2x BabyTree combination. Observed: " + observedCombinations);
+            assertTrue(observedCombinations.contains("2xTreeSapling"), 
+                      "Should observe 2x TreeSapling combination. Observed: " + observedCombinations);
             assertTrue(observedCombinations.contains("2xWoodStack"), 
                       "Should observe 2x WoodStack combination. Observed: " + observedCombinations);
             assertTrue(observedCombinations.contains("Mixed"), 

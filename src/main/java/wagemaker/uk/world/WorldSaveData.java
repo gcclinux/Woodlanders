@@ -47,7 +47,7 @@ public class WorldSaveData implements Serializable {
     private int bananaCount;
     private int bambooSaplingCount;
     private int bambooStackCount;
-    private int babyTreeCount;
+    private int treeSaplingCount;
     private int woodStackCount;
     private int pebbleCount;
     
@@ -101,7 +101,7 @@ public class WorldSaveData implements Serializable {
         this.bananaCount = 0;
         this.bambooSaplingCount = 0;
         this.bambooStackCount = 0;
-        this.babyTreeCount = 0;
+        this.treeSaplingCount = 0;
         this.woodStackCount = 0;
         this.pebbleCount = 0;
     }
@@ -349,12 +349,12 @@ public class WorldSaveData implements Serializable {
         this.bambooStackCount = Math.max(0, bambooStackCount);
     }
     
-    public int getBabyTreeCount() {
-        return babyTreeCount;
+    public int getTreeSaplingCount() {
+        return treeSaplingCount;
     }
     
-    public void setBabyTreeCount(int babyTreeCount) {
-        this.babyTreeCount = Math.max(0, babyTreeCount);
+    public void setTreeSaplingCount(int treeSaplingCount) {
+        this.treeSaplingCount = Math.max(0, treeSaplingCount);
     }
     
     public int getWoodStackCount() {

@@ -73,7 +73,7 @@ All phases (1-8) have been successfully implemented.
 2. Bananas
 3. Bamboo Sapling
 4. Bamboo Stacks
-5. Baby Trees
+5. Tree Saplings
 6. Wood Stacks
 7. Pebbles
 8. Palm Fiber

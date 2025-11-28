@@ -45,7 +45,7 @@ public class PlantedTree {
             spriteSheet.getTextureData().prepare();
             Pixmap sheetPixmap = spriteSheet.getTextureData().consumePixmap();
             
-            // BabyTree coordinates: 384 from left, 128 from top, 64x64 size
+            // TreeSapling coordinates: 384 from left, 128 from top, 64x64 size
             pixmap.drawPixmap(sheetPixmap, 0, 0, 384, 128, 64, 64);
             
             sharedTexture = new Texture(pixmap);

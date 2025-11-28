@@ -112,7 +112,7 @@ public class InventoryManager {
                 inventory.addBambooStack(amount);
                 break;
             case BABY_TREE:
-                inventory.addBabyTree(amount);
+                inventory.addTreeSapling(amount);
                 break;
             case WOOD_STACK:
                 inventory.addWoodStack(amount);
@@ -144,7 +144,7 @@ public class InventoryManager {
                 inventory.getBananaCount(),
                 inventory.getBambooSaplingCount(),
                 inventory.getBambooStackCount(),
-                inventory.getBabyTreeCount(),
+                inventory.getTreeSaplingCount(),
                 inventory.getWoodStackCount(),
                 inventory.getPebbleCount(),
                 inventory.getPalmFiberCount()
@@ -172,12 +172,12 @@ public class InventoryManager {
      * @param bananaCount The banana count from server
      * @param bambooSaplingCount The baby bamboo count from server
      * @param bambooStackCount The bamboo stack count from server
-     * @param babyTreeCount The baby tree count from server
+     * @param treeSaplingCount The baby tree count from server
      * @param woodStackCount The wood stack count from server
      * @param pebbleCount The pebble count from server
      */
     public void syncFromServer(int appleCount, int bananaCount, int bambooSaplingCount, 
-                                int bambooStackCount, int babyTreeCount, int woodStackCount, int pebbleCount, int palmFiberCount) {
+                                int bambooStackCount, int treeSaplingCount, int woodStackCount, int pebbleCount, int palmFiberCount) {
         if (!isMultiplayerMode) {
             return; // Only sync in multiplayer mode
         }
@@ -187,7 +187,7 @@ public class InventoryManager {
         inventory.setBananaCount(bananaCount);
         inventory.setBambooSaplingCount(bambooSaplingCount);
         inventory.setBambooStackCount(bambooStackCount);
-        inventory.setBabyTreeCount(babyTreeCount);
+        inventory.setTreeSaplingCount(treeSaplingCount);
         inventory.setWoodStackCount(woodStackCount);
         inventory.setPebbleCount(pebbleCount);
         inventory.setPalmFiberCount(palmFiberCount);
@@ -196,7 +196,7 @@ public class InventoryManager {
                          ", Bananas=" + bananaCount +
                          ", BambooSapling=" + bambooSaplingCount +
                          ", BambooStack=" + bambooStackCount +
-                         ", BabyTree=" + babyTreeCount +
+                         ", TreeSapling=" + treeSaplingCount +
                          ", WoodStack=" + woodStackCount +
                          ", Pebbles=" + pebbleCount +
                          ", PalmFibers=" + palmFiberCount);
@@ -327,7 +327,7 @@ public class InventoryManager {
             case 1: itemCount = inventory.getBananaCount(); break;
             case 2: itemCount = inventory.getBambooSaplingCount(); break;
             case 3: itemCount = inventory.getBambooStackCount(); break;
-            case 4: itemCount = inventory.getBabyTreeCount(); break;
+            case 4: itemCount = inventory.getTreeSaplingCount(); break;
             case 5: itemCount = inventory.getWoodStackCount(); break;
             case 6: itemCount = inventory.getPebbleCount(); break;
             case 7: itemCount = inventory.getPalmFiberCount(); break;

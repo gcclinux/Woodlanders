@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import wagemaker.uk.items.Apple;
 import wagemaker.uk.items.BambooSapling;
-import wagemaker.uk.items.BabyTree;
+import wagemaker.uk.items.TreeSapling;
 import wagemaker.uk.items.Banana;
 import wagemaker.uk.items.BambooStack;
 import wagemaker.uk.items.PalmFiber;
@@ -89,7 +89,7 @@ public class Player {
     private Map<String, Banana> bananas;
     private Map<String, wagemaker.uk.items.BambooStack> bambooStacks;
     private Map<String, wagemaker.uk.items.BambooSapling> bambooSaplings;
-    private Map<String, BabyTree> babyTrees;
+    private Map<String, TreeSapling> treeSaplings;
     private Map<String, WoodStack> woodStacks;
     private Map<String, Pebble> pebbles;
     private Map<String, PalmFiber> palmFibers;
@@ -176,8 +176,8 @@ public class Player {
         this.bambooSaplings = bambooSaplings;
     }
     
-    public void setBabyTrees(Map<String, BabyTree> babyTrees) {
-        this.babyTrees = babyTrees;
+    public void setTreeSaplings(Map<String, TreeSapling> treeSaplings) {
+        this.treeSaplings = treeSaplings;
     }
     
     public void setWoodStacks(Map<String, WoodStack> woodStacks) {
@@ -552,7 +552,7 @@ public class Player {
         checkBambooSaplingPickups();
         
         // Check for baby tree pickups
-        checkBabyTreePickups();
+        checkTreeSaplingPickups();
         
         // Check for wood stack pickups
         checkWoodStackPickups();
@@ -856,20 +856,20 @@ public class Player {
                         float treeY = targetTree.getY();
                         
                         switch (dropType) {
-                            case 0: // 2x BabyTree
-                                babyTrees.put(targetKey + "-item1", new BabyTree(treeX, treeY));
-                                babyTrees.put(targetKey + "-item2", new BabyTree(treeX + 8, treeY));
-                                System.out.println("Dropped 2x BabyTree at: " + treeX + ", " + treeY);
+                            case 0: // 2x TreeSapling
+                                treeSaplings.put(targetKey + "-item1", new TreeSapling(treeX, treeY));
+                                treeSaplings.put(targetKey + "-item2", new TreeSapling(treeX + 8, treeY));
+                                System.out.println("Dropped 2x TreeSapling at: " + treeX + ", " + treeY);
                                 break;
                             case 1: // 2x WoodStack
                                 woodStacks.put(targetKey + "-item1", new WoodStack(treeX, treeY));
                                 woodStacks.put(targetKey + "-item2", new WoodStack(treeX + 8, treeY));
                                 System.out.println("Dropped 2x WoodStack at: " + treeX + ", " + treeY);
                                 break;
-                            case 2: // 1x BabyTree + 1x WoodStack
-                                babyTrees.put(targetKey + "-item1", new BabyTree(treeX, treeY));
+                            case 2: // 1x TreeSapling + 1x WoodStack
+                                treeSaplings.put(targetKey + "-item1", new TreeSapling(treeX, treeY));
                                 woodStacks.put(targetKey + "-item2", new WoodStack(treeX + 8, treeY));
-                                System.out.println("Dropped 1x BabyTree + 1x WoodStack at: " + treeX + ", " + treeY);
+                                System.out.println("Dropped 1x TreeSapling + 1x WoodStack at: " + treeX + ", " + treeY);
                                 break;
                         }
                         
@@ -1417,7 +1417,7 @@ public class Player {
         }
         // Handle baby tree planting (slot 4)
         else if (selectedSlot == 4) {
-            if (inventoryManager.getCurrentInventory().getBabyTreeCount() > 0) {
+            if (inventoryManager.getCurrentInventory().getTreeSaplingCount() > 0) {
                 executeTreePlanting(targetX, targetY);
             } else {
                 System.out.println("No baby tree in inventory");
@@ -1560,7 +1560,7 @@ public class Player {
      */
     private void executeTreePlanting(float targetX, float targetY) {
         // Store initial inventory state for potential rollback
-        int initialBabyTreeCount = inventoryManager.getCurrentInventory().getBabyTreeCount();
+        int initialTreeSaplingCount = inventoryManager.getCurrentInventory().getTreeSaplingCount();
         
         // Validate grass biome for tree planting
         if (!plantingSystem.canPlantTree(targetX, targetY, biomeManager)) {
@@ -1573,7 +1573,7 @@ public class Player {
         
         if (plantedTreeId != null) {
             // Deduct baby tree from inventory
-            boolean removed = inventoryManager.getCurrentInventory().removeBabyTree(1);
+            boolean removed = inventoryManager.getCurrentInventory().removeTreeSapling(1);
             if (!removed) {
                 // Failed to remove item - rollback planting
                 plantedTrees.remove(plantedTreeId);
@@ -1605,7 +1605,7 @@ public class Player {
                     }
                     
                     // Restore inventory (add baby tree back)
-                    inventoryManager.getCurrentInventory().addBabyTree(1);
+                    inventoryManager.getCurrentInventory().addTreeSapling(1);
                     
                     System.out.println("Tree planting rolled back due to network error");
                 }
@@ -2076,30 +2076,30 @@ public class Player {
         }
     }
     
-    private void checkBabyTreePickups() {
-        if (babyTrees != null) {
+    private void checkTreeSaplingPickups() {
+        if (treeSaplings != null) {
             // Check all baby trees for pickup
-            for (Map.Entry<String, BabyTree> entry : babyTrees.entrySet()) {
-                BabyTree babyTree = entry.getValue();
-                String babyTreeKey = entry.getKey();
+            for (Map.Entry<String, TreeSapling> entry : treeSaplings.entrySet()) {
+                TreeSapling treeSapling = entry.getValue();
+                String treeSaplingKey = entry.getKey();
                 
                 // Check if player is close enough to pick up baby tree (32px range)
-                float dx = Math.abs((x + 32) - (babyTree.getX() + 16)); // Player center to baby tree center
-                float dy = Math.abs((y + 32) - (babyTree.getY() + 16)); // BabyTree is 32x32, so center is +16
+                float dx = Math.abs((x + 32) - (treeSapling.getX() + 16)); // Player center to baby tree center
+                float dy = Math.abs((y + 32) - (treeSapling.getY() + 16)); // TreeSapling is 32x32, so center is +16
                 
                 if (dx <= 32 && dy <= 32) {
                     // Pick up the baby tree
-                    pickupBabyTree(babyTreeKey);
+                    pickupTreeSapling(treeSaplingKey);
                     break; // Only pick up one baby tree per frame
                 }
             }
         }
     }
     
-    private void pickupBabyTree(String babyTreeKey) {
+    private void pickupTreeSapling(String treeSaplingKey) {
         // Send pickup request to server in multiplayer mode
         if (gameClient != null && gameClient.isConnected() && isLocalPlayer) {
-            gameClient.sendItemPickup(babyTreeKey);
+            gameClient.sendItemPickup(treeSaplingKey);
             // In multiplayer, server handles item removal
             // The server will broadcast the pickup to all clients
         } else {
@@ -2109,11 +2109,11 @@ public class Player {
             }
             
             // Remove baby tree from game
-            if (babyTrees.containsKey(babyTreeKey)) {
-                BabyTree babyTree = babyTrees.get(babyTreeKey);
-                babyTree.dispose();
-                babyTrees.remove(babyTreeKey);
-                System.out.println("BabyTree removed from game");
+            if (treeSaplings.containsKey(treeSaplingKey)) {
+                TreeSapling treeSapling = treeSaplings.get(treeSaplingKey);
+                treeSapling.dispose();
+                treeSaplings.remove(treeSaplingKey);
+                System.out.println("TreeSapling removed from game");
             }
         }
     }

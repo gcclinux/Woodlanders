@@ -46,7 +46,7 @@ public class FreeWorldManager {
         inventory.setBananaCount(250);
         inventory.setBambooSaplingCount(250);
         inventory.setBambooStackCount(250);
-        inventory.setBabyTreeCount(250);
+        inventory.setTreeSaplingCount(250);
         inventory.setWoodStackCount(250);
         inventory.setPebbleCount(250);
         inventory.setPalmFiberCount(250);

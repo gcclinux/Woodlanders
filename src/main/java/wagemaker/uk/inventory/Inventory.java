@@ -10,7 +10,7 @@ public class Inventory {
     private int bananaCount;
     private int bambooSaplingCount;
     private int bambooStackCount;
-    private int babyTreeCount;
+    private int treeSaplingCount;
     private int woodStackCount;
     private int pebbleCount;
     private int palmFiberCount;
@@ -20,7 +20,7 @@ public class Inventory {
         this.bananaCount = 0;
         this.bambooSaplingCount = 0;
         this.bambooStackCount = 0;
-        this.babyTreeCount = 0;
+        this.treeSaplingCount = 0;
         this.woodStackCount = 0;
         this.pebbleCount = 0;
         this.palmFiberCount = 0;
@@ -110,22 +110,22 @@ public class Inventory {
         return false;
     }
     
-    // BabyTree methods
-    public int getBabyTreeCount() {
-        return babyTreeCount;
+    // TreeSapling methods
+    public int getTreeSaplingCount() {
+        return treeSaplingCount;
     }
     
-    public void setBabyTreeCount(int count) {
-        this.babyTreeCount = Math.max(0, count);
+    public void setTreeSaplingCount(int count) {
+        this.treeSaplingCount = Math.max(0, count);
     }
     
-    public void addBabyTree(int amount) {
-        this.babyTreeCount += amount;
+    public void addTreeSapling(int amount) {
+        this.treeSaplingCount += amount;
     }
     
-    public boolean removeBabyTree(int amount) {
-        if (babyTreeCount >= amount) {
-            babyTreeCount -= amount;
+    public boolean removeTreeSapling(int amount) {
+        if (treeSaplingCount >= amount) {
+            treeSaplingCount -= amount;
             return true;
         }
         return false;
@@ -202,7 +202,7 @@ public class Inventory {
         this.bananaCount = 0;
         this.bambooSaplingCount = 0;
         this.bambooStackCount = 0;
-        this.babyTreeCount = 0;
+        this.treeSaplingCount = 0;
         this.woodStackCount = 0;
         this.pebbleCount = 0;
         this.palmFiberCount = 0;

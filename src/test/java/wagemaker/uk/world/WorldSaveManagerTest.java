@@ -742,14 +742,14 @@ public class WorldSaveManagerTest {
     
     @Test
     @Order(20)
-    public void testBabyTreeInventorySaveLoad() {
-        // Create inventory with BabyTree items
+    public void testTreeSaplingInventorySaveLoad() {
+        // Create inventory with TreeSapling items
         wagemaker.uk.inventory.Inventory testInventory = new wagemaker.uk.inventory.Inventory();
         testInventory.setAppleCount(5);
         testInventory.setBananaCount(3);
         testInventory.setBambooSaplingCount(7);
         testInventory.setBambooStackCount(4);
-        testInventory.setBabyTreeCount(10); // Set BabyTree count
+        testInventory.setTreeSaplingCount(10); // Set TreeSapling count
         testInventory.setWoodStackCount(6);
         testInventory.setPebbleCount(2);
         
@@ -764,7 +764,7 @@ public class WorldSaveManagerTest {
             false
         );
         
-        assertTrue(saveResult, "Save with BabyTree inventory should succeed");
+        assertTrue(saveResult, "Save with TreeSapling inventory should succeed");
         
         // Load the save
         WorldSaveData loadedData = WorldSaveManager.loadWorld("babytree-inventory-test", false);
@@ -775,7 +775,7 @@ public class WorldSaveManagerTest {
         assertEquals(3, loadedData.getBananaCount(), "Banana count should be restored");
         assertEquals(7, loadedData.getBambooSaplingCount(), "BambooSapling count should be restored");
         assertEquals(4, loadedData.getBambooStackCount(), "BambooStack count should be restored");
-        assertEquals(10, loadedData.getBabyTreeCount(), "BabyTree count should be restored");
+        assertEquals(10, loadedData.getTreeSaplingCount(), "TreeSapling count should be restored");
         assertEquals(6, loadedData.getWoodStackCount(), "WoodStack count should be restored");
         assertEquals(2, loadedData.getPebbleCount(), "Pebble count should be restored");
         
