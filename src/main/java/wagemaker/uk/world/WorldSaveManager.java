@@ -240,6 +240,7 @@ public class WorldSaveManager {
                 saveData.setAppleCount(inventory.getAppleCount());
                 saveData.setBananaCount(inventory.getBananaCount());
                 saveData.setAppleSaplingCount(inventory.getAppleSaplingCount());
+                saveData.setBananaSaplingCount(inventory.getBananaSaplingCount());
                 saveData.setBambooSaplingCount(inventory.getBambooSaplingCount());
                 saveData.setBambooStackCount(inventory.getBambooStackCount());
                 saveData.setTreeSaplingCount(inventory.getTreeSaplingCount());

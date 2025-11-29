@@ -406,6 +406,7 @@ public class GameMessageHandler extends DefaultMessageHandler {
                 message.getAppleCount(),
                 message.getBananaCount(),
                 message.getAppleSaplingCount(),
+                message.getBananaSaplingCount(),
                 message.getBambooSaplingCount(),
                 message.getBambooStackCount(),
                 message.getTreeSaplingCount(),

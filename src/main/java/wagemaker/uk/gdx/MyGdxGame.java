@@ -24,6 +24,7 @@ import wagemaker.uk.items.BambooSapling;
 import wagemaker.uk.items.TreeSapling;
 import wagemaker.uk.items.BambooStack;
 import wagemaker.uk.items.Banana;
+import wagemaker.uk.items.BananaSapling;
 import wagemaker.uk.items.PalmFiber;
 import wagemaker.uk.items.Pebble;
 import wagemaker.uk.items.WoodStack;
@@ -187,6 +188,7 @@ public class MyGdxGame extends ApplicationAdapter {
     Map<String, Apple> apples;
     Map<String, AppleSapling> appleSaplings;
     Map<String, Banana> bananas;
+    Map<String, BananaSapling> bananaSaplings;
     Map<String, BambooStack> bambooStacks;
     Map<String, BambooSapling> bambooSaplings;
     Map<String, TreeSapling> treeSaplings;
@@ -281,6 +283,7 @@ public class MyGdxGame extends ApplicationAdapter {
         apples = new HashMap<>();
         appleSaplings = new HashMap<>();
         bananas = new HashMap<>();
+        bananaSaplings = new HashMap<>();
         bambooStacks = new HashMap<>();
         bambooSaplings = new HashMap<>();
         treeSaplings = new HashMap<>();
@@ -329,6 +332,7 @@ public class MyGdxGame extends ApplicationAdapter {
         player.setApples(apples);
         player.setAppleSaplings(appleSaplings);
         player.setBananas(bananas);
+        player.setBananaSaplings(bananaSaplings);
         player.setBambooStacks(bambooStacks);
         player.setBambooSaplings(bambooSaplings);
         player.setTreeSaplings(treeSaplings);
@@ -712,6 +716,7 @@ public class MyGdxGame extends ApplicationAdapter {
         drawApples();
         drawAppleSaplings();
         drawBananas();
+        drawBananaSaplings();
         drawBambooStacks();
         drawBambooSaplings();
         drawTreeSaplings();
@@ -1233,6 +1238,21 @@ public class MyGdxGame extends ApplicationAdapter {
             if (Math.abs(banana.getX() - camX) < viewWidth && 
                 Math.abs(banana.getY() - camY) < viewHeight) {
                 batch.draw(banana.getTexture(), banana.getX(), banana.getY(), 32, 32);
+            }
+        }
+    }
+    
+    private void drawBananaSaplings() {
+        float camX = camera.position.x;
+        float camY = camera.position.y;
+        float viewWidth = viewport.getWorldWidth() / 2;
+        float viewHeight = viewport.getWorldHeight() / 2;
+        
+        for (BananaSapling bananaSapling : bananaSaplings.values()) {
+            // only draw banana saplings near camera
+            if (Math.abs(bananaSapling.getX() - camX) < viewWidth && 
+                Math.abs(bananaSapling.getY() - camY) < viewHeight) {
+                batch.draw(bananaSapling.getTexture(), bananaSapling.getX(), bananaSapling.getY(), 32, 32);
             }
         }
     }
@@ -2435,6 +2455,9 @@ public class MyGdxGame extends ApplicationAdapter {
         if (bananas.containsKey(itemId)) {
             return wagemaker.uk.inventory.ItemType.BANANA;
         }
+        if (bananaSaplings.containsKey(itemId)) {
+            return wagemaker.uk.inventory.ItemType.BANANA_SAPLING;
+        }
         if (bambooStacks.containsKey(itemId)) {
             return wagemaker.uk.inventory.ItemType.BAMBOO_STACK;
         }
@@ -2476,6 +2499,13 @@ public class MyGdxGame extends ApplicationAdapter {
         if (banana != null) {
             // Defer texture disposal to render thread
             deferOperation(() -> banana.dispose());
+            return;
+        }
+        
+        BananaSapling bananaSapling = bananaSaplings.remove(itemId);
+        if (bananaSapling != null) {
+            // Defer texture disposal to render thread
+            deferOperation(() -> bananaSapling.dispose());
             return;
         }
         
@@ -3994,6 +4024,11 @@ public class MyGdxGame extends ApplicationAdapter {
                 case BANANA:
                     if (!bananas.containsKey(itemId)) {
                         bananas.put(itemId, new Banana(x, y));
+                    }
+                    break;
+                case BANANA_SAPLING:
+                    if (!bananaSaplings.containsKey(itemId)) {
+                        bananaSaplings.put(itemId, new BananaSapling(x, y));
                     }
                     break;
                 case BAMBOO_STACK:

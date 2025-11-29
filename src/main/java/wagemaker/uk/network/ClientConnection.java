@@ -553,14 +553,26 @@ public class ClientConnection implements Runnable {
                 
                 System.out.println("Item spawned: APPLE_SAPLING at (" + appleSaplingX + ", " + quantizedY + ")");
             } else if (tree.getType() == TreeType.BANANA) {
-                String itemId = UUID.randomUUID().toString();
-                ItemState item = new ItemState(itemId, ItemType.BANANA, quantizedX, quantizedY, false);
-                server.getWorldState().addOrUpdateItem(item);
+                // Spawn Banana at tree position
+                String bananaId = UUID.randomUUID().toString();
+                ItemState banana = new ItemState(bananaId, ItemType.BANANA, quantizedX, quantizedY, false);
+                server.getWorldState().addOrUpdateItem(banana);
                 
-                ItemSpawnMessage spawnMsg = new ItemSpawnMessage("server", itemId, ItemType.BANANA, quantizedX, quantizedY);
-                server.broadcastToAll(spawnMsg);
+                ItemSpawnMessage bananaSpawnMsg = new ItemSpawnMessage("server", bananaId, ItemType.BANANA, quantizedX, quantizedY);
+                server.broadcastToAll(bananaSpawnMsg);
                 
                 System.out.println("Item spawned: BANANA at (" + quantizedX + ", " + quantizedY + ")");
+                
+                // Spawn BananaSapling offset by 8 pixels horizontally
+                String bananaSaplingId = UUID.randomUUID().toString();
+                float bananaSaplingX = quantizePosition(tree.getX() + 8);
+                ItemState bananaSapling = new ItemState(bananaSaplingId, ItemType.BANANA_SAPLING, bananaSaplingX, quantizedY, false);
+                server.getWorldState().addOrUpdateItem(bananaSapling);
+                
+                ItemSpawnMessage bananaSaplingSpawnMsg = new ItemSpawnMessage("server", bananaSaplingId, ItemType.BANANA_SAPLING, bananaSaplingX, quantizedY);
+                server.broadcastToAll(bananaSaplingSpawnMsg);
+                
+                System.out.println("Item spawned: BANANA_SAPLING at (" + bananaSaplingX + ", " + quantizedY + ")");
             } else if (tree.getType() == TreeType.COCONUT) {
                 // Drop PalmFiber when CoconutTree is destroyed
                 String itemId = UUID.randomUUID().toString();
@@ -850,6 +862,7 @@ public class ClientConnection implements Runnable {
             playerState.getAppleCount(),
             playerState.getBananaCount(),
             playerState.getAppleSaplingCount(),
+            playerState.getBananaSaplingCount(),
             playerState.getBambooSaplingCount(),
             playerState.getBambooStackCount(),
             playerState.getTreeSaplingCount(),
@@ -1013,6 +1026,7 @@ public class ClientConnection implements Runnable {
             playerState.getAppleCount(),
             playerState.getBananaCount(),
             playerState.getAppleSaplingCount(),
+            playerState.getBananaSaplingCount(),
             playerState.getBambooSaplingCount(),
             playerState.getBambooStackCount(),
             playerState.getTreeSaplingCount(),
@@ -1488,6 +1502,7 @@ public class ClientConnection implements Runnable {
             playerState.getAppleCount(),
             playerState.getBananaCount(),
             playerState.getAppleSaplingCount(),
+            playerState.getBananaSaplingCount(),
             playerState.getBambooSaplingCount(),
             playerState.getBambooStackCount(),
             playerState.getTreeSaplingCount(),

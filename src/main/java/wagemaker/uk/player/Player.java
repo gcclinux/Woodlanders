@@ -11,6 +11,7 @@ import wagemaker.uk.items.AppleSapling;
 import wagemaker.uk.items.BambooSapling;
 import wagemaker.uk.items.TreeSapling;
 import wagemaker.uk.items.Banana;
+import wagemaker.uk.items.BananaSapling;
 import wagemaker.uk.items.BambooStack;
 import wagemaker.uk.items.PalmFiber;
 import wagemaker.uk.items.Pebble;
@@ -89,6 +90,7 @@ public class Player {
     private Map<String, Apple> apples;
     private Map<String, AppleSapling> appleSaplings;
     private Map<String, Banana> bananas;
+    private Map<String, BananaSapling> bananaSaplings;
     private Map<String, wagemaker.uk.items.BambooStack> bambooStacks;
     private Map<String, wagemaker.uk.items.BambooSapling> bambooSaplings;
     private Map<String, TreeSapling> treeSaplings;
@@ -172,6 +174,10 @@ public class Player {
     
     public void setBananas(Map<String, Banana> bananas) {
         this.bananas = bananas;
+    }
+    
+    public void setBananaSaplings(Map<String, BananaSapling> bananaSaplings) {
+        this.bananaSaplings = bananaSaplings;
     }
     
     public void setBambooStacks(Map<String, wagemaker.uk.items.BambooStack> bambooStacks) {
@@ -553,6 +559,9 @@ public class Player {
         
         // Check for banana pickups
         checkBananaPickups();
+        
+        // Check for banana sapling pickups
+        checkBananaSaplingPickups();
         
         // Check for bamboo stack pickups
         checkBambooStackPickups();
@@ -1150,9 +1159,17 @@ public class Player {
                     attackedSomething = true;
                     
                     if (destroyed) {
-                        // Spawn banana at tree position
+                        // Spawn Banana at tree position
                         bananas.put(targetKey, new Banana(targetBananaTree.getX(), targetBananaTree.getY()));
-                        System.out.println("Banana dropped at: " + targetBananaTree.getX() + ", " + targetBananaTree.getY());
+                        
+                        // Spawn BananaSapling offset by 8 pixels horizontally
+                        bananaSaplings.put(targetKey + "-bananasapling", 
+                            new BananaSapling(targetBananaTree.getX() + 8, targetBananaTree.getY()));
+                        
+                        System.out.println("Banana tree destroyed! Banana dropped at: " + 
+                            targetBananaTree.getX() + ", " + targetBananaTree.getY());
+                        System.out.println("BananaSapling dropped at: " + 
+                            (targetBananaTree.getX() + 8) + ", " + targetBananaTree.getY());
                         
                         // Register for respawn before removing
                         if (gameInstance != null && gameInstance instanceof wagemaker.uk.gdx.MyGdxGame) {
@@ -1342,15 +1359,15 @@ public class Player {
             if (currentSelection == -1) {
                 newSelection = 0; // Start at first slot
             } else {
-                newSelection = (currentSelection + 1) % 7; // Wrap to 0 after slot 6
+                newSelection = (currentSelection + 1) % 10; // Wrap to 0 after slot 9
             }
         }
         // LEFT arrow: move to previous slot (wrap around)
         else if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
             if (currentSelection == -1) {
-                newSelection = 6; // Start at last slot
+                newSelection = 9; // Start at last slot
             } else {
-                newSelection = (currentSelection - 1 + 7) % 7; // Wrap to 6 from slot 0
+                newSelection = (currentSelection - 1 + 10) % 10; // Wrap to 9 from slot 0
             }
         }
         // UP/DOWN: Reserved for future multi-row layout
@@ -2025,6 +2042,46 @@ public class Player {
                     pickupBanana(bananaKey);
                     break; // Only pick up one banana per frame
                 }
+            }
+        }
+    }
+    
+    private void checkBananaSaplingPickups() {
+        if (bananaSaplings != null) {
+            for (Map.Entry<String, BananaSapling> entry : bananaSaplings.entrySet()) {
+                BananaSapling bananaSapling = entry.getValue();
+                String bananaSaplingKey = entry.getKey();
+                
+                // Check if player is close enough to pick up (32px range)
+                float dx = Math.abs((x + 32) - (bananaSapling.getX() + 16)); // BananaSapling is 32x32, so center is +16
+                float dy = Math.abs((y + 32) - (bananaSapling.getY() + 16));
+                
+                if (dx <= 32 && dy <= 32) {
+                    pickupBananaSapling(bananaSaplingKey);
+                    break;
+                }
+            }
+        }
+    }
+    
+    private void pickupBananaSapling(String bananaSaplingKey) {
+        // Send pickup request to server in multiplayer mode
+        if (gameClient != null && gameClient.isConnected() && isLocalPlayer) {
+            gameClient.sendItemPickup(bananaSaplingKey);
+            // In multiplayer, server handles item removal
+            // The server will broadcast the pickup to all clients
+        } else {
+            // Single-player mode: handle locally via inventory manager
+            if (inventoryManager != null) {
+                inventoryManager.collectItem(wagemaker.uk.inventory.ItemType.BANANA_SAPLING);
+            }
+            
+            // Remove banana sapling from game
+            if (bananaSaplings.containsKey(bananaSaplingKey)) {
+                BananaSapling bananaSapling = bananaSaplings.get(bananaSaplingKey);
+                bananaSapling.dispose();
+                bananaSaplings.remove(bananaSaplingKey);
+                System.out.println("BananaSapling removed from game");
             }
         }
     }

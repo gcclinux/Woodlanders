@@ -9,6 +9,7 @@ public class Inventory {
     private int appleCount;
     private int bananaCount;
     private int appleSaplingCount;
+    private int bananaSaplingCount;
     private int bambooSaplingCount;
     private int bambooStackCount;
     private int treeSaplingCount;
@@ -20,6 +21,7 @@ public class Inventory {
         this.appleCount = 0;
         this.bananaCount = 0;
         this.appleSaplingCount = 0;
+        this.bananaSaplingCount = 0;
         this.bambooSaplingCount = 0;
         this.bambooStackCount = 0;
         this.treeSaplingCount = 0;
@@ -86,6 +88,27 @@ public class Inventory {
     public boolean removeAppleSapling(int amount) {
         if (appleSaplingCount >= amount) {
             appleSaplingCount -= amount;
+            return true;
+        }
+        return false;
+    }
+    
+    // BananaSapling methods
+    public int getBananaSaplingCount() {
+        return bananaSaplingCount;
+    }
+    
+    public void setBananaSaplingCount(int count) {
+        this.bananaSaplingCount = Math.max(0, count);
+    }
+    
+    public void addBananaSapling(int amount) {
+        this.bananaSaplingCount += amount;
+    }
+    
+    public boolean removeBananaSapling(int amount) {
+        if (bananaSaplingCount >= amount) {
+            bananaSaplingCount -= amount;
             return true;
         }
         return false;
@@ -224,6 +247,7 @@ public class Inventory {
         this.appleCount = 0;
         this.bananaCount = 0;
         this.appleSaplingCount = 0;
+        this.bananaSaplingCount = 0;
         this.bambooSaplingCount = 0;
         this.bambooStackCount = 0;
         this.treeSaplingCount = 0;

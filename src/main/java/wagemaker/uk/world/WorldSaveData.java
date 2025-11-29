@@ -46,6 +46,7 @@ public class WorldSaveData implements Serializable {
     private int appleCount;
     private int bananaCount;
     private int appleSaplingCount;
+    private int bananaSaplingCount;
     private int bambooSaplingCount;
     private int bambooStackCount;
     private int treeSaplingCount;
@@ -341,6 +342,14 @@ public class WorldSaveData implements Serializable {
     
     public void setAppleSaplingCount(int appleSaplingCount) {
         this.appleSaplingCount = Math.max(0, appleSaplingCount);
+    }
+    
+    public int getBananaSaplingCount() {
+        return bananaSaplingCount;
+    }
+    
+    public void setBananaSaplingCount(int bananaSaplingCount) {
+        this.bananaSaplingCount = Math.max(0, bananaSaplingCount);
     }
     
     public int getBambooSaplingCount() {

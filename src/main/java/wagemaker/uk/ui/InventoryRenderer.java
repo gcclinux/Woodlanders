@@ -24,6 +24,7 @@ public class InventoryRenderer {
     private Texture pebbleIcon;
     private Texture palmFiberIcon;
     private Texture appleSaplingIcon;
+    private Texture bananaSaplingIcon;
     
     // Background and UI elements
     private Texture woodenBackground;
@@ -39,7 +40,7 @@ public class InventoryRenderer {
     private static final int SLOT_SIZE = 40;
     private static final int SLOT_SPACING = 8;
     private static final int PANEL_PADDING = 8;
-    private static final int PANEL_WIDTH = (SLOT_SIZE * 9) + (SLOT_SPACING * 8) + (PANEL_PADDING * 2);
+    private static final int PANEL_WIDTH = (SLOT_SIZE * 10) + (SLOT_SPACING * 9) + (PANEL_PADDING * 2);
     private static final int PANEL_HEIGHT = SLOT_SIZE + (PANEL_PADDING * 2);
     private static final int ICON_SIZE = 32;
     
@@ -92,6 +93,9 @@ public class InventoryRenderer {
         
         // Load apple sapling icon (192, 254, 64x64)
         appleSaplingIcon = extractIconFromSpriteSheet(192, 254, 64, 64);
+        
+        // Load banana sapling icon (192, 192, 64x64)
+        bananaSaplingIcon = extractIconFromSpriteSheet(192, 192, 64, 64);
     }
     
     /**
@@ -184,12 +188,12 @@ public class InventoryRenderer {
         float slotX = panelX + PANEL_PADDING;
         float slotY = panelY + PANEL_PADDING;
         
-        for (int i = 0; i < 9; i++) {
+        for (int i = 0; i < 10; i++) {
             float x = slotX + i * (SLOT_SIZE + SLOT_SPACING);
             batch.draw(slotBorder, x, slotY, SLOT_SIZE, SLOT_SIZE);
         }
         
-        // Render slots with icons and counts in order: Apple, Banana, BambooSapling, BambooStack, TreeSapling, WoodStack, Pebble, PalmFiber, AppleSapling
+        // Render slots with icons and counts in order: Apple, Banana, BambooSapling, BambooStack, TreeSapling, WoodStack, Pebble, PalmFiber, AppleSapling, BananaSapling
         renderSlot(batch, appleIcon, inventory.getAppleCount(), slotX, slotY, selectedSlot == 0);
         renderSlot(batch, bananaIcon, inventory.getBananaCount(), slotX + (SLOT_SIZE + SLOT_SPACING), slotY, selectedSlot == 1);
         renderSlot(batch, bambooSaplingIcon, inventory.getBambooSaplingCount(), slotX + 2 * (SLOT_SIZE + SLOT_SPACING), slotY, selectedSlot == 2);
@@ -199,6 +203,7 @@ public class InventoryRenderer {
         renderSlot(batch, pebbleIcon, inventory.getPebbleCount(), slotX + 6 * (SLOT_SIZE + SLOT_SPACING), slotY, selectedSlot == 6);
         renderSlot(batch, palmFiberIcon, inventory.getPalmFiberCount(), slotX + 7 * (SLOT_SIZE + SLOT_SPACING), slotY, selectedSlot == 7);
         renderSlot(batch, appleSaplingIcon, inventory.getAppleSaplingCount(), slotX + 8 * (SLOT_SIZE + SLOT_SPACING), slotY, selectedSlot == 8);
+        renderSlot(batch, bananaSaplingIcon, inventory.getBananaSaplingCount(), slotX + 9 * (SLOT_SIZE + SLOT_SPACING), slotY, selectedSlot == 9);
         
         batch.end();
     }
@@ -274,6 +279,7 @@ public class InventoryRenderer {
         if (pebbleIcon != null) pebbleIcon.dispose();
         if (palmFiberIcon != null) palmFiberIcon.dispose();
         if (appleSaplingIcon != null) appleSaplingIcon.dispose();
+        if (bananaSaplingIcon != null) bananaSaplingIcon.dispose();
         if (woodenBackground != null) woodenBackground.dispose();
         if (slotBorder != null) slotBorder.dispose();
         if (countFont != null) countFont.dispose();

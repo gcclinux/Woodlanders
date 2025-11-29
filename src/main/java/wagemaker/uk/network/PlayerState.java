@@ -23,6 +23,7 @@ public class PlayerState implements Serializable {
     private int appleCount;
     private int bananaCount;
     private int appleSaplingCount;
+    private int bananaSaplingCount;
     private int bambooSaplingCount;
     private int bambooStackCount;
     private int treeSaplingCount;
@@ -148,6 +149,14 @@ public class PlayerState implements Serializable {
     
     public void setAppleSaplingCount(int appleSaplingCount) {
         this.appleSaplingCount = appleSaplingCount;
+    }
+    
+    public int getBananaSaplingCount() {
+        return bananaSaplingCount;
+    }
+    
+    public void setBananaSaplingCount(int bananaSaplingCount) {
+        this.bananaSaplingCount = bananaSaplingCount;
     }
     
     public int getBambooSaplingCount() {
