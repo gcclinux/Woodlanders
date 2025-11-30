@@ -289,6 +289,14 @@ public class ClientConnection implements Runnable {
                 handleBananaTreeTransform((BananaTreeTransformMessage) message);
                 break;
                 
+            case APPLE_TREE_PLANT:
+                handleAppleTreePlant((AppleTreePlantMessage) message);
+                break;
+                
+            case APPLE_TREE_TRANSFORM:
+                handleAppleTreeTransform((AppleTreeTransformMessage) message);
+                break;
+                
             case PLAYER_RESPAWN:
                 handlePlayerRespawn((PlayerRespawnMessage) message);
                 break;
@@ -1809,6 +1817,94 @@ public class ClientConnection implements Runnable {
         server.getWorldState().addOrUpdateTree(bananaTree);
         
         System.out.println("[SERVER] Banana tree transformed: " + plantedBananaTreeId + " -> " + bananaTreeId + " at (" + x + ", " + y + ")");
+        
+        server.broadcastToAll(message);
+    }
+    
+    /**
+     * Handles an apple tree plant message.
+     * This is sent by clients when they plant an apple sapling.
+     * @param message The apple tree plant message
+     */
+    private void handleAppleTreePlant(AppleTreePlantMessage message) {
+        if (message == null) {
+            logSecurityViolation("Null apple tree plant message");
+            return;
+        }
+        
+        String plantedAppleTreeId = message.getPlantedAppleTreeId();
+        float x = message.getX();
+        float y = message.getY();
+        
+        if (plantedAppleTreeId == null || plantedAppleTreeId.isEmpty()) {
+            System.err.println("Invalid planted apple tree ID from " + clientId);
+            logSecurityViolation("Invalid planted apple tree ID");
+            return;
+        }
+        
+        if (!isValidPosition(x, y)) {
+            System.err.println("Invalid apple tree plant position from " + clientId);
+            logSecurityViolation("Invalid apple tree plant position");
+            return;
+        }
+        
+        float dx = x - playerState.getX();
+        float dy = y - playerState.getY();
+        float distance = (float) Math.sqrt(dx * dx + dy * dy);
+        
+        int maxRange = server.getConfig().getPlantingMaxRange();
+        
+        if (distance > maxRange) {
+            System.out.println("Apple tree plant out of range from " + clientId + 
+                ": attempted distance=" + String.format("%.1f", distance) + 
+                " pixels, max allowed=" + maxRange + " pixels");
+            logSecurityViolation("Apple tree plant range check failed");
+            return;
+        }
+        
+        System.out.println("[ClientConnection] Player " + clientId + " planted apple tree at (" + x + ", " + y + ")");
+        
+        PlantedAppleTreeState state = new PlantedAppleTreeState(plantedAppleTreeId, x, y, 0.0f);
+        server.getWorldState().getPlantedAppleTrees().put(plantedAppleTreeId, state);
+        
+        server.broadcastToAll(message);
+    }
+    
+    /**
+     * Handles an apple tree transform message.
+     * This is sent by clients when a planted apple tree matures into an apple tree.
+     * @param message The apple tree transform message
+     */
+    private void handleAppleTreeTransform(AppleTreeTransformMessage message) {
+        if (message == null) {
+            logSecurityViolation("Null apple tree transform message");
+            return;
+        }
+        
+        String plantedAppleTreeId = message.getPlantedAppleTreeId();
+        String appleTreeId = message.getAppleTreeId();
+        float x = message.getX();
+        float y = message.getY();
+        
+        if (plantedAppleTreeId == null || plantedAppleTreeId.isEmpty() ||
+            appleTreeId == null || appleTreeId.isEmpty()) {
+            System.err.println("Invalid apple tree transform IDs from " + clientId);
+            logSecurityViolation("Invalid apple tree transform IDs");
+            return;
+        }
+        
+        if (!isValidPosition(x, y)) {
+            System.err.println("Invalid apple tree transform position from " + clientId);
+            logSecurityViolation("Invalid apple tree transform position");
+            return;
+        }
+        
+        server.getWorldState().getPlantedAppleTrees().remove(plantedAppleTreeId);
+        
+        TreeState appleTree = new TreeState(appleTreeId, TreeType.APPLE, x, y, 100.0f, true);
+        server.getWorldState().addOrUpdateTree(appleTree);
+        
+        System.out.println("[SERVER] Apple tree transformed: " + plantedAppleTreeId + " -> " + appleTreeId + " at (" + x + ", " + y + ")");
         
         server.broadcastToAll(message);
     }

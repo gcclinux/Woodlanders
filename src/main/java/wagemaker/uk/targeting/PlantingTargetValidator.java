@@ -5,6 +5,8 @@ import wagemaker.uk.biome.BiomeType;
 import wagemaker.uk.inventory.InventoryManager;
 import wagemaker.uk.planting.PlantedBamboo;
 import wagemaker.uk.planting.PlantedTree;
+import wagemaker.uk.planting.PlantedBananaTree;
+import wagemaker.uk.planting.PlantedAppleTree;
 import wagemaker.uk.trees.BambooTree;
 import wagemaker.uk.trees.SmallTree;
 import wagemaker.uk.trees.AppleTree;
@@ -32,6 +34,8 @@ public class PlantingTargetValidator implements TargetValidator {
     private Map<String, AppleTree> appleTrees;
     private Map<String, CoconutTree> coconutTrees;
     private Map<String, BananaTree> bananaTrees;
+    private Map<String, PlantedBananaTree> plantedBananaTrees;
+    private Map<String, PlantedAppleTree> plantedAppleTrees;
     
     /**
      * Creates a new PlantingTargetValidator.
@@ -68,6 +72,18 @@ public class PlantingTargetValidator implements TargetValidator {
         this.appleTrees = appleTrees;
         this.coconutTrees = coconutTrees;
         this.bananaTrees = bananaTrees;
+    }
+    
+    /**
+     * Sets the planted banana trees and planted apple trees maps for validation.
+     * 
+     * @param plantedBananaTrees Map of existing planted banana trees
+     * @param plantedAppleTrees Map of existing planted apple trees
+     */
+    public void setPlantedFruitTreeMaps(Map<String, PlantedBananaTree> plantedBananaTrees,
+                                        Map<String, PlantedAppleTree> plantedAppleTrees) {
+        this.plantedBananaTrees = plantedBananaTrees;
+        this.plantedAppleTrees = plantedAppleTrees;
     }
     
     @Override
@@ -114,6 +130,12 @@ public class PlantingTargetValidator implements TargetValidator {
             return treeSaplingCount > 0;
         }
         
+        // Check apple sapling (slot 8)
+        if (selectedSlot == 8) {
+            int appleSaplingCount = inventoryManager.getCurrentInventory().getAppleSaplingCount();
+            return appleSaplingCount > 0;
+        }
+        
         // Check banana sapling (slot 9)
         if (selectedSlot == 9) {
             int bananaSaplingCount = inventoryManager.getCurrentInventory().getBananaSaplingCount();
@@ -148,6 +170,11 @@ public class PlantingTargetValidator implements TargetValidator {
             return biomeType == BiomeType.GRASS;
         }
         
+        // Apple sapling requires grass biome (slot 8)
+        if (selectedSlot == 8) {
+            return biomeType == BiomeType.GRASS;
+        }
+        
         // Banana sapling requires grass biome (slot 9)
         if (selectedSlot == 9) {
             return biomeType == BiomeType.GRASS;
@@ -179,6 +206,18 @@ public class PlantingTargetValidator implements TargetValidator {
         
         // Check for planted tree
         if (plantedTrees != null && plantedTrees.containsKey(treeKey)) {
+            return true;
+        }
+        
+        // Check for planted banana tree
+        String bananaTreeKey = "planted-banana-tree-" + (int)tileX + "-" + (int)tileY;
+        if (plantedBananaTrees != null && plantedBananaTrees.containsKey(bananaTreeKey)) {
+            return true;
+        }
+        
+        // Check for planted apple tree
+        String appleTreeKey = "planted-apple-tree-" + (int)tileX + "-" + (int)tileY;
+        if (plantedAppleTrees != null && plantedAppleTrees.containsKey(appleTreeKey)) {
             return true;
         }
         

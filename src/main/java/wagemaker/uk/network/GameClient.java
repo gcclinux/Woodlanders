@@ -492,6 +492,23 @@ public class GameClient {
     }
     
     /**
+     * Send apple tree plant message to server.
+     * 
+     * @param plantedAppleTreeId The unique ID for the planted apple tree
+     * @param x The tile-aligned x position
+     * @param y The tile-aligned y position
+     */
+    public void sendAppleTreePlant(String plantedAppleTreeId, float x, float y) {
+        if (clientId == null) {
+            System.err.println("Cannot send apple tree plant: client ID not set");
+            return;
+        }
+        
+        AppleTreePlantMessage message = new AppleTreePlantMessage(clientId, plantedAppleTreeId, x, y);
+        sendMessage(message);
+    }
+    
+    /**
      * Sends a heartbeat message to the server to maintain connection.
      */
     public void sendHeartbeat() {

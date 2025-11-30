@@ -48,9 +48,9 @@ For manual installation or building from source, see the **[Installation Guide](
 
 <div align="center">
 
-### Latest Screenshot Multi Character selection
-![Latest 0.0.25](screenshots/multi-character-selection.png)
-*New multi character selection with multiplayer synchronisation*
+### Latest Screenshot Apple and Banana Sapling implemented
+![Latest 0.0.25](screenshots/Apple_and_Bamboo_sapling.png)
+*New Apple and Banna Sapling and a list of all Implemented Items*
 
 ### 📸 [More Woodland Screenshots](docs/SCREENSHOTS.md)
 

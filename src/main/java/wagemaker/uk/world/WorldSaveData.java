@@ -6,6 +6,7 @@ import wagemaker.uk.network.ItemState;
 import wagemaker.uk.network.PlantedTreeState;
 import wagemaker.uk.network.PlantedBambooState;
 import wagemaker.uk.network.PlantedBananaTreeState;
+import wagemaker.uk.network.PlantedAppleTreeState;
 import wagemaker.uk.weather.RainZone;
 import wagemaker.uk.respawn.RespawnEntry;
 
@@ -33,6 +34,7 @@ public class WorldSaveData implements Serializable {
     private Map<String, PlantedTreeState> plantedTrees;
     private Map<String, PlantedBambooState> plantedBamboos;
     private Map<String, PlantedBananaTreeState> plantedBananaTrees;
+    private Map<String, PlantedAppleTreeState> plantedAppleTrees;
     private Set<String> clearedPositions;
     private List<RainZone> rainZones;
     
@@ -272,6 +274,14 @@ public class WorldSaveData implements Serializable {
     
     public void setPlantedBananaTrees(Map<String, PlantedBananaTreeState> plantedBananaTrees) {
         this.plantedBananaTrees = plantedBananaTrees;
+    }
+    
+    public Map<String, PlantedAppleTreeState> getPlantedAppleTrees() {
+        return plantedAppleTrees;
+    }
+    
+    public void setPlantedAppleTrees(Map<String, PlantedAppleTreeState> plantedAppleTrees) {
+        this.plantedAppleTrees = plantedAppleTrees;
     }
     
     public float getPlayerX() {

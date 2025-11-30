@@ -260,6 +260,68 @@ public class PlantingSystem {
     }
     
     /**
+     * Check if a tile is valid for planting apple trees (grass biomes).
+     * 
+     * @param x The x-coordinate (tile-aligned)
+     * @param y The y-coordinate (tile-aligned)
+     * @param biomeManager The biome manager for tile type checking
+     * @return true if tile is grass biome, false otherwise
+     */
+    public boolean canPlantAppleTree(float x, float y, BiomeManager biomeManager) {
+        if (biomeManager == null) {
+            return false;
+        }
+        
+        BiomeType biomeType = biomeManager.getBiomeAtPosition(x, y);
+        return biomeType == BiomeType.GRASS;
+    }
+    
+    /**
+     * Attempt to plant an apple tree at the specified coordinates.
+     * Creates a PlantedAppleTree instance and adds it to the provided map.
+     * 
+     * @param x The x-coordinate for planting (will be tile-aligned)
+     * @param y The y-coordinate for planting (will be tile-aligned)
+     * @param plantedAppleTrees Map to add the planted apple tree to
+     * @return Unique ID of the planted apple tree, or null if planting failed
+     */
+    public String plantAppleTree(float x, float y, Map<String, PlantedAppleTree> plantedAppleTrees) {
+        if (plantedAppleTrees == null) {
+            return null;
+        }
+        
+        float tileX = snapToTileGrid(x);
+        float tileY = snapToTileGrid(y);
+        
+        String plantedAppleTreeId = generatePlantedAppleTreeKey(tileX, tileY);
+        
+        if (plantedAppleTrees.containsKey(plantedAppleTreeId)) {
+            return null;
+        }
+        
+        PlantedAppleTree plantedAppleTree = new PlantedAppleTree(tileX, tileY);
+        plantedAppleTrees.put(plantedAppleTreeId, plantedAppleTree);
+        
+        System.out.println("Apple tree planted at tile: (" + tileX + ", " + tileY + ") with ID: " + plantedAppleTreeId);
+        
+        return plantedAppleTreeId;
+    }
+    
+    /**
+     * Generate unique key for planted apple tree based on tile coordinates.
+     * Format: "planted-apple-tree-{tileX}-{tileY}"
+     * 
+     * @param x The x-coordinate (tile-aligned)
+     * @param y The y-coordinate (tile-aligned)
+     * @return Unique tile-based key string
+     */
+    private String generatePlantedAppleTreeKey(float x, float y) {
+        int tileX = (int) x;
+        int tileY = (int) y;
+        return "planted-apple-tree-" + tileX + "-" + tileY;
+    }
+    
+    /**
      * Snap coordinates to 64x64 tile grid.
      * Ensures planted bamboos and trees align with tile boundaries.
      * 

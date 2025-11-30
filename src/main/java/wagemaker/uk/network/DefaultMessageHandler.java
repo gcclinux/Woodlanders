@@ -135,6 +135,14 @@ public class DefaultMessageHandler implements MessageHandler {
                     handleBananaTreeTransform((BananaTreeTransformMessage) message);
                     break;
                     
+                case APPLE_TREE_PLANT:
+                    handleAppleTreePlant((AppleTreePlantMessage) message);
+                    break;
+                    
+                case APPLE_TREE_TRANSFORM:
+                    handleAppleTreeTransform((AppleTreeTransformMessage) message);
+                    break;
+                    
                 case TREE_CREATED:
                     handleTreeCreated((TreeCreatedMessage) message);
                     break;
@@ -444,6 +452,26 @@ public class DefaultMessageHandler implements MessageHandler {
     protected void handleBananaTreeTransform(BananaTreeTransformMessage message) {
         System.out.println("Banana tree transformed: " + message.getPlantedBananaTreeId() + 
                          " -> " + message.getBananaTreeId() + 
+                         " at (" + message.getX() + ", " + message.getY() + ")");
+    }
+    
+    /**
+     * Handles APPLE_TREE_PLANT message.
+     * Override this method to add planted apple trees to game world.
+     */
+    protected void handleAppleTreePlant(AppleTreePlantMessage message) {
+        System.out.println("Apple tree planted: " + message.getPlantedAppleTreeId() + 
+                         " at (" + message.getX() + ", " + message.getY() + 
+                         ") by player " + message.getPlayerId());
+    }
+    
+    /**
+     * Handles APPLE_TREE_TRANSFORM message.
+     * Override this method to transform planted apple trees into apple trees.
+     */
+    protected void handleAppleTreeTransform(AppleTreeTransformMessage message) {
+        System.out.println("Apple tree transformed: " + message.getPlantedAppleTreeId() + 
+                         " -> " + message.getAppleTreeId() + 
                          " at (" + message.getX() + ", " + message.getY() + ")");
     }
     

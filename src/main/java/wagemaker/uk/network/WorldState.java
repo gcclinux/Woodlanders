@@ -28,6 +28,7 @@ public class WorldState implements Serializable {
     private Map<String, PlantedTreeState> plantedTrees;
     private Map<String, PlantedBambooState> plantedBamboos;
     private Map<String, PlantedBananaTreeState> plantedBananaTrees;
+    private Map<String, PlantedAppleTreeState> plantedAppleTrees;
     private Set<String> clearedPositions;
     private List<RainZone> rainZones;
     private long lastUpdateTimestamp;
@@ -44,6 +45,7 @@ public class WorldState implements Serializable {
         this.plantedTrees = new ConcurrentHashMap<>();
         this.plantedBamboos = new ConcurrentHashMap<>();
         this.plantedBananaTrees = new ConcurrentHashMap<>();
+        this.plantedAppleTrees = new ConcurrentHashMap<>();
         this.clearedPositions = ConcurrentHashMap.newKeySet();
         this.rainZones = new ArrayList<>();
         this.lastUpdateTimestamp = System.currentTimeMillis();
@@ -575,6 +577,18 @@ public class WorldState implements Serializable {
             snapshot.plantedBananaTrees.put(entry.getKey(), copy);
         }
         
+        // Deep copy planted apple trees
+        for (Map.Entry<String, PlantedAppleTreeState> entry : this.plantedAppleTrees.entrySet()) {
+            PlantedAppleTreeState original = entry.getValue();
+            PlantedAppleTreeState copy = new PlantedAppleTreeState(
+                original.getPlantedAppleTreeId(),
+                original.getX(),
+                original.getY(),
+                original.getGrowthTimer()
+            );
+            snapshot.plantedAppleTrees.put(entry.getKey(), copy);
+        }
+        
         // Copy cleared positions
         snapshot.clearedPositions.addAll(this.clearedPositions);
         
@@ -777,6 +791,14 @@ public class WorldState implements Serializable {
     
     public void setPlantedBananaTrees(Map<String, PlantedBananaTreeState> plantedBananaTrees) {
         this.plantedBananaTrees = plantedBananaTrees;
+    }
+    
+    public Map<String, PlantedAppleTreeState> getPlantedAppleTrees() {
+        return plantedAppleTrees;
+    }
+    
+    public void setPlantedAppleTrees(Map<String, PlantedAppleTreeState> plantedAppleTrees) {
+        this.plantedAppleTrees = plantedAppleTrees;
     }
     
     // Convenience methods for managing state
@@ -1233,6 +1255,21 @@ public class WorldState implements Serializable {
                 }
             }
             
+            // Restore planted apple trees with deep copy
+            this.plantedAppleTrees.clear();
+            if (saveData.getPlantedAppleTrees() != null) {
+                for (Map.Entry<String, PlantedAppleTreeState> entry : saveData.getPlantedAppleTrees().entrySet()) {
+                    PlantedAppleTreeState original = entry.getValue();
+                    PlantedAppleTreeState copy = new PlantedAppleTreeState(
+                        original.getPlantedAppleTreeId(),
+                        original.getX(),
+                        original.getY(),
+                        original.getGrowthTimer()
+                    );
+                    this.plantedAppleTrees.put(entry.getKey(), copy);
+                }
+            }
+            
             // Restore cleared positions
             this.clearedPositions.clear();
             if (saveData.getClearedPositions() != null) {
@@ -1319,6 +1356,12 @@ public class WorldState implements Serializable {
             this.plantedBananaTrees = new ConcurrentHashMap<>();
         }
         
+        if (this.plantedAppleTrees != null) {
+            this.plantedAppleTrees.clear();
+        } else {
+            this.plantedAppleTrees = new ConcurrentHashMap<>();
+        }
+        
         if (this.clearedPositions != null) {
             this.clearedPositions.clear();
         } else {
@@ -1354,7 +1397,8 @@ public class WorldState implements Serializable {
         
         // Check collections are not null
         if (trees == null || stones == null || items == null || plantedTrees == null || 
-            plantedBamboos == null || plantedBananaTrees == null || clearedPositions == null || rainZones == null) {
+            plantedBamboos == null || plantedBananaTrees == null || plantedAppleTrees == null || 
+            clearedPositions == null || rainZones == null) {
             System.err.println("Restored state validation failed: Null collections after restoration");
             return false;
         }
@@ -1464,6 +1508,7 @@ public class WorldState implements Serializable {
             this.plantedTrees = new ConcurrentHashMap<>(rollbackState.plantedTrees);
             this.plantedBamboos = new ConcurrentHashMap<>(rollbackState.plantedBamboos);
             this.plantedBananaTrees = new ConcurrentHashMap<>(rollbackState.plantedBananaTrees);
+            this.plantedAppleTrees = new ConcurrentHashMap<>(rollbackState.plantedAppleTrees);
             this.clearedPositions = ConcurrentHashMap.newKeySet();
             this.clearedPositions.addAll(rollbackState.clearedPositions);
             this.rainZones = new ArrayList<>(rollbackState.rainZones);

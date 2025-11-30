@@ -111,6 +111,7 @@ public class Player {
     private Map<String, PlantedBamboo> plantedBamboos;
     private Map<String, PlantedTree> plantedTrees;
     private Map<String, wagemaker.uk.planting.PlantedBananaTree> plantedBananaTrees;
+    private Map<String, wagemaker.uk.planting.PlantedAppleTree> plantedAppleTrees;
     
     // Targeting system fields
     private TargetingSystem targetingSystem;
@@ -253,6 +254,10 @@ public class Player {
         this.plantedBananaTrees = plantedBananaTrees;
     }
     
+    public void setPlantedAppleTrees(Map<String, wagemaker.uk.planting.PlantedAppleTree> plantedAppleTrees) {
+        this.plantedAppleTrees = plantedAppleTrees;
+    }
+    
     public void setPuddleManager(PuddleManager puddleManager) {
         this.puddleManager = puddleManager;
         System.out.println("DEBUG: PuddleManager set on Player - puddle fall damage enabled");
@@ -273,6 +278,11 @@ public class Player {
             if (plantedTrees != null && trees != null && appleTrees != null && 
                 coconutTrees != null && bananaTrees != null) {
                 validator.setTreeMaps(plantedTrees, trees, appleTrees, coconutTrees, bananaTrees);
+            }
+            
+            // Set planted fruit tree maps if available
+            if (plantedBananaTrees != null && plantedAppleTrees != null) {
+                validator.setPlantedFruitTreeMaps(plantedBananaTrees, plantedAppleTrees);
             }
             
             targetingSystem.setValidator(validator);
@@ -1471,6 +1481,14 @@ public class Player {
                 System.out.println("No baby tree in inventory");
             }
         }
+        // Handle apple tree planting (slot 8)
+        else if (selectedSlot == 8) {
+            if (inventoryManager.getCurrentInventory().getAppleSaplingCount() > 0) {
+                executeAppleTreePlanting(targetX, targetY);
+            } else {
+                System.out.println("No apple sapling in inventory");
+            }
+        }
         // Handle banana tree planting (slot 9)
         else if (selectedSlot == 9) {
             if (inventoryManager.getCurrentInventory().getBananaSaplingCount() > 0) {
@@ -1742,6 +1760,77 @@ public class Player {
             }
         } else {
             System.out.println("Banana tree planting failed: invalid location or tile already occupied");
+        }
+    }
+    
+    /**
+     * Execute apple tree planting at the specified target coordinates.
+     * Called by the targeting system callback when target is confirmed for apple saplings.
+     * Includes error handling and state rollback on failure.
+     */
+    private void executeAppleTreePlanting(float targetX, float targetY) {
+        System.out.println("[DEBUG] executeAppleTreePlanting called at (" + targetX + ", " + targetY + ")");
+        
+        // Store initial inventory state for potential rollback
+        int initialAppleSaplingCount = inventoryManager.getCurrentInventory().getAppleSaplingCount();
+        System.out.println("[DEBUG] AppleSapling count: " + initialAppleSaplingCount);
+        
+        // Validate grass biome for apple tree planting
+        if (!plantingSystem.canPlantAppleTree(targetX, targetY, biomeManager)) {
+            System.out.println("[DEBUG] Apple tree planting failed: can only plant apple trees on grass biomes");
+            wagemaker.uk.biome.BiomeType biome = biomeManager.getBiomeAtPosition(targetX, targetY);
+            System.out.println("[DEBUG] Current biome at position: " + biome);
+            return;
+        }
+        System.out.println("[DEBUG] Biome check passed - grass biome confirmed");
+        
+        // Attempt to plant apple tree at target coordinates
+        String plantedAppleTreeId = plantingSystem.plantAppleTree(targetX, targetY, plantedAppleTrees);
+        
+        if (plantedAppleTreeId != null) {
+            // Deduct apple sapling from inventory
+            boolean removed = inventoryManager.getCurrentInventory().removeAppleSapling(1);
+            if (!removed) {
+                // Failed to remove item - rollback planting
+                plantedAppleTrees.remove(plantedAppleTreeId);
+                System.out.println("Apple tree planting failed: could not deduct apple sapling from inventory");
+                return;
+            }
+            
+            System.out.println("Apple tree planted successfully at: " + plantedAppleTreeId);
+            
+            // Send planting message to server in multiplayer
+            if (gameClient != null && gameClient.isConnected()) {
+                try {
+                    // Extract coordinates from planted apple tree
+                    wagemaker.uk.planting.PlantedAppleTree plantedAppleTree = plantedAppleTrees.get(plantedAppleTreeId);
+                    if (plantedAppleTree != null) {
+                        gameClient.sendAppleTreePlant(plantedAppleTreeId, plantedAppleTree.getX(), plantedAppleTree.getY());
+                        
+                        // Send inventory update after planting (apple sapling was deducted)
+                        inventoryManager.sendInventoryUpdateToServer();
+                    }
+                } catch (Exception e) {
+                    // Network error - rollback state
+                    System.err.println("Failed to send apple tree planting message to server: " + e.getMessage());
+                    
+                    // Remove planted apple tree from local state
+                    wagemaker.uk.planting.PlantedAppleTree plantedAppleTree = plantedAppleTrees.remove(plantedAppleTreeId);
+                    if (plantedAppleTree != null) {
+                        plantedAppleTree.dispose();
+                    }
+                    
+                    // Restore inventory (add apple sapling back)
+                    inventoryManager.getCurrentInventory().addAppleSapling(1);
+                    
+                    System.out.println("Apple tree planting rolled back due to network error");
+                }
+            } else {
+                // Single-player mode: check for auto-deselection
+                inventoryManager.checkAndAutoDeselect();
+            }
+        } else {
+            System.out.println("Apple tree planting failed: invalid location or tile already occupied");
         }
     }
 

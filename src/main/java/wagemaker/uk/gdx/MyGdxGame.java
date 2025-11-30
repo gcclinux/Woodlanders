@@ -198,6 +198,7 @@ public class MyGdxGame extends ApplicationAdapter {
     Map<String, PlantedBamboo> plantedBamboos;
     Map<String, PlantedTree> plantedTrees;
     Map<String, wagemaker.uk.planting.PlantedBananaTree> plantedBananaTrees;
+    Map<String, wagemaker.uk.planting.PlantedAppleTree> plantedAppleTrees;
     Map<String, Stone> stones;
     Map<String, Stone> stoneMap;
     Cactus cactus; // Single cactus near spawn
@@ -244,6 +245,8 @@ public class MyGdxGame extends ApplicationAdapter {
     private java.util.concurrent.ConcurrentLinkedQueue<wagemaker.uk.network.TreeTransformMessage> pendingTreeTransforms;
     private java.util.concurrent.ConcurrentLinkedQueue<wagemaker.uk.network.BananaTreePlantMessage> pendingBananaTreePlants;
     private java.util.concurrent.ConcurrentLinkedQueue<wagemaker.uk.network.BananaTreeTransformMessage> pendingBananaTreeTransforms;
+    private java.util.concurrent.ConcurrentLinkedQueue<wagemaker.uk.network.AppleTreePlantMessage> pendingAppleTreePlants;
+    private java.util.concurrent.ConcurrentLinkedQueue<wagemaker.uk.network.AppleTreeTransformMessage> pendingAppleTreeTransforms;
     
     // Queue for operations that must execute on the render thread (e.g., OpenGL operations)
     private java.util.concurrent.ConcurrentLinkedQueue<Runnable> pendingDeferredOperations;
@@ -296,6 +299,7 @@ public class MyGdxGame extends ApplicationAdapter {
         plantedBamboos = new HashMap<>();
         plantedTrees = new HashMap<>();
         plantedBananaTrees = new HashMap<>();
+        plantedAppleTrees = new HashMap<>();
         stones = new HashMap<>();
         stoneMap = new HashMap<>();
         clearedPositions = new HashMap<>();
@@ -315,6 +319,8 @@ public class MyGdxGame extends ApplicationAdapter {
         pendingTreePlants = new java.util.concurrent.ConcurrentLinkedQueue<>();
         pendingBananaTreePlants = new java.util.concurrent.ConcurrentLinkedQueue<>();
         pendingBananaTreeTransforms = new java.util.concurrent.ConcurrentLinkedQueue<>();
+        pendingAppleTreePlants = new java.util.concurrent.ConcurrentLinkedQueue<>();
+        pendingAppleTreeTransforms = new java.util.concurrent.ConcurrentLinkedQueue<>();
         pendingTreeTransforms = new java.util.concurrent.ConcurrentLinkedQueue<>();
         
         // Initialize deferred operations queue
@@ -402,6 +408,7 @@ public class MyGdxGame extends ApplicationAdapter {
         player.setPlantedBamboos(plantedBamboos);
         player.setPlantedTrees(plantedTrees);
         player.setPlantedBananaTrees(plantedBananaTrees);
+        player.setPlantedAppleTrees(plantedAppleTrees);
 
         // Initialize rain system
         rainSystem = new RainSystem(shapeRenderer);
@@ -455,6 +462,8 @@ public class MyGdxGame extends ApplicationAdapter {
         processPendingTreeTransforms();
         processPendingBananaTreePlants();
         processPendingBananaTreeTransforms();
+        processPendingAppleTreePlants();
+        processPendingAppleTreeTransforms();
         processPendingTreeCreations();
         
         // Process pending world load operations on main thread (for OpenGL context)
@@ -554,6 +563,9 @@ public class MyGdxGame extends ApplicationAdapter {
             allTrees.add(new wagemaker.uk.weather.PuddleRenderer.TreePosition(tree.getX(), tree.getY()));
         }
         for (wagemaker.uk.planting.PlantedBananaTree tree : plantedBananaTrees.values()) {
+            allTrees.add(new wagemaker.uk.weather.PuddleRenderer.TreePosition(tree.getX(), tree.getY()));
+        }
+        for (wagemaker.uk.planting.PlantedAppleTree tree : plantedAppleTrees.values()) {
             allTrees.add(new wagemaker.uk.weather.PuddleRenderer.TreePosition(tree.getX(), tree.getY()));
         }
         for (PlantedBamboo bamboo : plantedBamboos.values()) {
@@ -697,6 +709,36 @@ public class MyGdxGame extends ApplicationAdapter {
             }
         }
         
+        // update planted apple trees and check for transformations
+        List<String> appleTreesToTransform = new ArrayList<>();
+        for (Map.Entry<String, wagemaker.uk.planting.PlantedAppleTree> entry : plantedAppleTrees.entrySet()) {
+            wagemaker.uk.planting.PlantedAppleTree planted = entry.getValue();
+            if (planted.update(deltaTime)) {
+                appleTreesToTransform.add(entry.getKey());
+            }
+        }
+        
+        // transform mature planted apple trees into apple trees
+        for (String key : appleTreesToTransform) {
+            wagemaker.uk.planting.PlantedAppleTree planted = plantedAppleTrees.remove(key);
+            float x = planted.getX();
+            float y = planted.getY();
+            
+            String appleTreeId = key;
+            
+            AppleTree tree = new AppleTree(x, y);
+            appleTrees.put(appleTreeId, tree);
+            planted.dispose();
+            
+            if (gameClient != null && gameClient.isConnected()) {
+                wagemaker.uk.network.AppleTreeTransformMessage message = 
+                    new wagemaker.uk.network.AppleTreeTransformMessage(
+                        gameClient.getClientId(), key, appleTreeId, x, y
+                    );
+                gameClient.sendMessage(message);
+            }
+        }
+        
         // update cactus
         if (cactus != null) {
             cactus.update(deltaTime);
@@ -746,6 +788,8 @@ public class MyGdxGame extends ApplicationAdapter {
         drawPlantedTrees();
         // draw planted banana trees (after terrain, before trees)
         drawPlantedBananaTrees();
+        // draw planted apple trees (after terrain, before trees)
+        drawPlantedAppleTrees();
         // draw respawn indicators (after terrain, before trees)
         if (respawnManager != null) {
             respawnManager.renderIndicators(batch, deltaTime, 
@@ -1389,6 +1433,24 @@ public class MyGdxGame extends ApplicationAdapter {
                     batch.draw(texture, planted.getX(), planted.getY(), 32, 32);
                 } else {
                     System.err.println("[RENDER] PlantedBananaTree at (" + planted.getX() + ", " + planted.getY() + ") has null texture!");
+                }
+            }
+        }
+    }
+    
+    private void drawPlantedAppleTrees() {
+        float camX = camera.position.x;
+        float camY = camera.position.y;
+        float viewWidth = viewport.getWorldWidth() / 2;
+        float viewHeight = viewport.getWorldHeight() / 2;
+        
+        for (wagemaker.uk.planting.PlantedAppleTree planted : plantedAppleTrees.values()) {
+            if (Math.abs(planted.getX() - camX) < viewWidth && Math.abs(planted.getY() - camY) < viewHeight) {
+                Texture texture = planted.getTexture();
+                if (texture != null) {
+                    batch.draw(texture, planted.getX(), planted.getY(), 32, 32);
+                } else {
+                    System.err.println("[RENDER] PlantedAppleTree at (" + planted.getX() + ", " + planted.getY() + ") has null texture!");
                 }
             }
         }
@@ -3245,6 +3307,20 @@ public class MyGdxGame extends ApplicationAdapter {
         }
         worldState.setPlantedBananaTrees(plantedBananaTreeStates);
         
+        // Extract planted apple trees
+        Map<String, wagemaker.uk.network.PlantedAppleTreeState> plantedAppleTreeStates = new HashMap<>();
+        for (Map.Entry<String, wagemaker.uk.planting.PlantedAppleTree> entry : plantedAppleTrees.entrySet()) {
+            wagemaker.uk.planting.PlantedAppleTree plantedAppleTree = entry.getValue();
+            wagemaker.uk.network.PlantedAppleTreeState appleTreeState = new wagemaker.uk.network.PlantedAppleTreeState(
+                entry.getKey(),
+                plantedAppleTree.getX(),
+                plantedAppleTree.getY(),
+                plantedAppleTree.getGrowthTimer()
+            );
+            plantedAppleTreeStates.put(entry.getKey(), appleTreeState);
+        }
+        worldState.setPlantedAppleTrees(plantedAppleTreeStates);
+        
         return worldState;
     }
     
@@ -3321,6 +3397,12 @@ public class MyGdxGame extends ApplicationAdapter {
             if (saveData.getPlantedBananaTrees() != null) {
                 restorePlantedBananaTreesFromSave(saveData.getPlantedBananaTrees());
                 System.out.println("Restored " + saveData.getPlantedBananaTrees().size() + " planted banana trees");
+            }
+            
+            // Restore planted apple trees
+            if (saveData.getPlantedAppleTrees() != null) {
+                restorePlantedAppleTreesFromSave(saveData.getPlantedAppleTrees());
+                System.out.println("Restored " + saveData.getPlantedAppleTrees().size() + " planted apple trees");
             }
             
             // Restore player position and health from world save
@@ -3622,6 +3704,21 @@ public class MyGdxGame extends ApplicationAdapter {
                 plantedBananaTrees.put(plantedBananaTreeId, plantedBananaTree);
             } catch (Exception e) {
                 System.err.println("Error restoring planted banana tree " + plantedBananaTreeId + ": " + e.getMessage());
+            }
+        }
+    }
+    
+    private void restorePlantedAppleTreesFromSave(Map<String, wagemaker.uk.network.PlantedAppleTreeState> savedPlantedAppleTrees) {
+        for (Map.Entry<String, wagemaker.uk.network.PlantedAppleTreeState> entry : savedPlantedAppleTrees.entrySet()) {
+            String plantedAppleTreeId = entry.getKey();
+            wagemaker.uk.network.PlantedAppleTreeState appleTreeState = entry.getValue();
+            
+            try {
+                wagemaker.uk.planting.PlantedAppleTree plantedAppleTree = new wagemaker.uk.planting.PlantedAppleTree(appleTreeState.getX(), appleTreeState.getY());
+                plantedAppleTree.setGrowthTimer(appleTreeState.getGrowthTimer());
+                plantedAppleTrees.put(plantedAppleTreeId, plantedAppleTree);
+            } catch (Exception e) {
+                System.err.println("Error restoring planted apple tree " + plantedAppleTreeId + ": " + e.getMessage());
             }
         }
     }
@@ -4276,6 +4373,22 @@ public class MyGdxGame extends ApplicationAdapter {
     }
     
     /**
+     * Queues an apple tree plant to be processed on the main thread.
+     * @param message The apple tree plant message
+     */
+    public void queueAppleTreePlant(wagemaker.uk.network.AppleTreePlantMessage message) {
+        pendingAppleTreePlants.offer(message);
+    }
+    
+    /**
+     * Queues an apple tree transform to be processed on the main thread.
+     * @param message The apple tree transform message
+     */
+    public void queueAppleTreeTransform(wagemaker.uk.network.AppleTreeTransformMessage message) {
+        pendingAppleTreeTransforms.offer(message);
+    }
+    
+    /**
      * Processes pending bamboo plants on the main render thread.
      * This ensures OpenGL operations happen in the correct context.
      */
@@ -4435,6 +4548,40 @@ public class MyGdxGame extends ApplicationAdapter {
             if (!bananaTrees.containsKey(bananaTreeId)) {
                 BananaTree bananaTree = new BananaTree(x, y);
                 bananaTrees.put(bananaTreeId, bananaTree);
+            }
+        }
+    }
+
+    private void processPendingAppleTreePlants() {
+        wagemaker.uk.network.AppleTreePlantMessage message;
+        while ((message = pendingAppleTreePlants.poll()) != null) {
+            String plantedAppleTreeId = message.getPlantedAppleTreeId();
+            float x = message.getX();
+            float y = message.getY();
+            
+            if (!plantedAppleTrees.containsKey(plantedAppleTreeId)) {
+                wagemaker.uk.planting.PlantedAppleTree plantedAppleTree = new wagemaker.uk.planting.PlantedAppleTree(x, y);
+                plantedAppleTrees.put(plantedAppleTreeId, plantedAppleTree);
+            }
+        }
+    }
+    
+    private void processPendingAppleTreeTransforms() {
+        wagemaker.uk.network.AppleTreeTransformMessage message;
+        while ((message = pendingAppleTreeTransforms.poll()) != null) {
+            String plantedAppleTreeId = message.getPlantedAppleTreeId();
+            String appleTreeId = message.getAppleTreeId();
+            float x = message.getX();
+            float y = message.getY();
+            
+            wagemaker.uk.planting.PlantedAppleTree plantedAppleTree = plantedAppleTrees.remove(plantedAppleTreeId);
+            if (plantedAppleTree != null) {
+                plantedAppleTree.dispose();
+            }
+            
+            if (!appleTrees.containsKey(appleTreeId)) {
+                AppleTree appleTree = new AppleTree(x, y);
+                appleTrees.put(appleTreeId, appleTree);
             }
         }
     }
@@ -4677,6 +4824,11 @@ public class MyGdxGame extends ApplicationAdapter {
         
         // Dispose planted banana trees
         for (wagemaker.uk.planting.PlantedBananaTree planted : plantedBananaTrees.values()) {
+            planted.dispose();
+        }
+        
+        // Dispose planted apple trees
+        for (wagemaker.uk.planting.PlantedAppleTree planted : plantedAppleTrees.values()) {
             planted.dispose();
         }
         

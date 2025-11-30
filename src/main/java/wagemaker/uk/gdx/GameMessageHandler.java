@@ -505,6 +505,35 @@ public class GameMessageHandler extends DefaultMessageHandler {
     }
     
     @Override
+    protected void handleAppleTreePlant(wagemaker.uk.network.AppleTreePlantMessage message) {
+        String myClientId = game.getGameClient() != null ? game.getGameClient().getClientId() : "null";
+        String senderPlayerId = message.getPlayerId();
+        
+        System.out.println("[GameMessageHandler] Received AppleTreePlantMessage:");
+        System.out.println("  - My Client ID: " + myClientId);
+        System.out.println("  - Sender Player ID: " + senderPlayerId);
+        System.out.println("  - Planted Apple Tree ID: " + message.getPlantedAppleTreeId());
+        System.out.println("  - Position: (" + message.getX() + ", " + message.getY() + ")");
+        
+        // Don't process our own planting messages (already handled locally)
+        if (game.getGameClient() != null && 
+            message.getPlayerId().equals(game.getGameClient().getClientId())) {
+            System.out.println("  - SKIPPING: This is my own planting message");
+            return;
+        }
+        
+        System.out.println("  - PROCESSING: This is a remote player's planting");
+        // Queue apple tree planting to be processed on the main thread
+        game.queueAppleTreePlant(message);
+    }
+    
+    @Override
+    protected void handleAppleTreeTransform(wagemaker.uk.network.AppleTreeTransformMessage message) {
+        // Queue apple tree transformation to be processed on the main thread
+        game.queueAppleTreeTransform(message);
+    }
+    
+    @Override
     protected void handleTreeCreated(wagemaker.uk.network.TreeCreatedMessage message) {
         // Create tree state from message
         TreeState treeState = new TreeState(
