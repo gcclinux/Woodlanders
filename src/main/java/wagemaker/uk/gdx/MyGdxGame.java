@@ -1386,7 +1386,7 @@ public class MyGdxGame extends ApplicationAdapter {
             if (Math.abs(planted.getX() - camX) < viewWidth && Math.abs(planted.getY() - camY) < viewHeight) {
                 Texture texture = planted.getTexture();
                 if (texture != null) {
-                    batch.draw(texture, planted.getX(), planted.getY(), 64, 64);
+                    batch.draw(texture, planted.getX(), planted.getY(), 32, 32);
                 } else {
                     System.err.println("[RENDER] PlantedBananaTree at (" + planted.getX() + ", " + planted.getY() + ") has null texture!");
                 }
