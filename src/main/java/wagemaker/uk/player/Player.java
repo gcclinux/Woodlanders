@@ -1510,6 +1510,7 @@ public class Player {
      * Handle targeting input when targeting mode is active.
      * Processes A/W/D/S keys for directional movement and ESC for cancellation.
      * Also supports mouse movement and left-click for targeting.
+     * Mouse movement updates target position even when just hovering (not clicking).
      * Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 4.1, 4.2, 4.3, 4.4
      */
     private void handleTargetingInput() {
@@ -1528,12 +1529,11 @@ public class Player {
             targetingSystem.moveTarget(wagemaker.uk.targeting.Direction.DOWN);
         }
         
-        // Handle mouse movement for targeting
-        if (Gdx.input.isTouched()) {
-            int mouseX = Gdx.input.getX();
-            int mouseY = Gdx.input.getY();
-            targetingSystem.setTargetFromMouse(mouseX, mouseY);
-        }
+        // Handle mouse movement for targeting (updates on hover, not just when clicking)
+        // This allows the target indicator to follow the mouse cursor in real-time
+        int mouseX = Gdx.input.getX();
+        int mouseY = Gdx.input.getY();
+        targetingSystem.setTargetFromMouse(mouseX, mouseY);
         
         // Handle left mouse click for planting (same as spacebar/P key)
         if (Gdx.input.justTouched()) {
