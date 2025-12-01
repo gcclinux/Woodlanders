@@ -79,6 +79,7 @@ public class LauncherApplication extends Application {
 
     @Override
     public void start(Stage stage) {
+        stage.getIcons().add(new javafx.scene.image.Image(getClass().getResourceAsStream("/icon.png")));
         stage.setTitle(localization.get("launcher.title"));
 
         Label heading = new Label(localization.get("launcher.title"));
@@ -138,12 +139,12 @@ public class LauncherApplication extends Application {
 
         if (latest.isEmpty()) {
             if (jarExists) {
-                return buildModel(LauncherState.OFFLINE_READY, 
+                return buildModel(LauncherState.OFFLINE_READY,
                         localization.get("launcher.button.launch_offline"), true,
                         localization.get("launcher.status.offline_ready"),
                         localMeta.map(VersionMetadata::version).orElse("cached"), "unknown");
             }
-            return buildModel(LauncherState.BLOCKED, 
+            return buildModel(LauncherState.BLOCKED,
                     localization.get("launcher.button.retry"), true,
                     localization.get("launcher.status.no_connection"),
                     "missing", "unknown");
@@ -155,16 +156,16 @@ public class LauncherApplication extends Application {
         boolean versionsMatch = jarExists && localMeta.map(meta -> remoteVersion.equals(meta.version())).orElse(false);
 
         if (versionsMatch) {
-            return buildModel(LauncherState.READY_TO_LAUNCH, 
+            return buildModel(LauncherState.READY_TO_LAUNCH,
                     localization.get("launcher.button.launch"), true,
-                    localization.get("launcher.status.ready").replace("{0}", remoteVersion), 
+                    localization.get("launcher.status.ready").replace("{0}", remoteVersion),
                     localVersion, remoteVersion);
         }
 
-        String label = jarExists 
+        String label = jarExists
                 ? localization.get("launcher.button.update").replace("{0}", remoteVersion)
                 : localization.get("launcher.button.download").replace("{0}", remoteVersion);
-        String message = jarExists 
+        String message = jarExists
                 ? localization.get("launcher.status.update_available")
                 : localization.get("launcher.status.download_required");
         return buildModel(LauncherState.NEEDS_UPDATE, label, true, message, localVersion, remoteVersion);
@@ -182,36 +183,37 @@ public class LauncherApplication extends Application {
     private void downloadLatest() {
         ReleaseInfo release = currentRelease.orElse(null);
         if (release == null) {
-            applyModel(buildModel(LauncherState.ERROR, 
+            applyModel(buildModel(LauncherState.ERROR,
                     localization.get("launcher.button.retry"), true,
                     localization.get("launcher.status.no_metadata"),
                     currentModel.localVersion(), currentModel.remoteVersion()));
             return;
         }
-        applyModel(buildModel(LauncherState.UPDATING, 
+        applyModel(buildModel(LauncherState.UPDATING,
                 localization.get("launcher.button.downloading"), false,
                 localization.get("launcher.status.downloading").replace("{0}", release.tagName()),
                 currentModel.localVersion(), release.tagName()));
         executor.submit(() -> {
             try {
                 DownloadResult result = downloadService.downloadRelease(release);
-                VersionMetadata metadata = new VersionMetadata(release.tagName(), result.sha256(), Instant.now(), result.size());
+                VersionMetadata metadata = new VersionMetadata(release.tagName(), result.sha256(), Instant.now(),
+                        result.size());
                 versionService.writeMetadata(metadata);
                 currentMetadata = Optional.of(metadata);
-                applyLater(buildModel(LauncherState.READY_TO_LAUNCH, 
+                applyLater(buildModel(LauncherState.READY_TO_LAUNCH,
                         localization.get("launcher.button.launch"), true,
                         localization.get("launcher.status.updated").replace("{0}", release.tagName()),
                         metadata.version(), release.tagName()));
             } catch (IOException e) {
                 LOG.error("Download failed", e);
-                applyLater(buildModel(LauncherState.ERROR, 
+                applyLater(buildModel(LauncherState.ERROR,
                         localization.get("launcher.button.retry"), true,
                         localization.get("launcher.status.download_failed").replace("{0}", e.getMessage()),
                         currentModel.localVersion(), release.tagName()));
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 LOG.warn("Download interrupted", e);
-                applyLater(buildModel(LauncherState.ERROR, 
+                applyLater(buildModel(LauncherState.ERROR,
                         localization.get("launcher.button.retry"), true,
                         localization.get("launcher.status.download_interrupted"),
                         currentModel.localVersion(), release.tagName()));
@@ -220,21 +222,21 @@ public class LauncherApplication extends Application {
     }
 
     private void launchClient() {
-        applyModel(buildModel(LauncherState.LAUNCHING, 
+        applyModel(buildModel(LauncherState.LAUNCHING,
                 localization.get("launcher.button.launching"), false,
                 localization.get("launcher.status.launching"),
                 currentModel.localVersion(), currentModel.remoteVersion()));
         executor.submit(() -> {
             try {
                 gameLaunchService.launchClient();
-                applyLater(buildModel(LauncherState.READY_TO_LAUNCH, 
+                applyLater(buildModel(LauncherState.READY_TO_LAUNCH,
                         localization.get("launcher.button.launch"), true,
                         localization.get("launcher.status.launched"),
                         currentMetadata.map(VersionMetadata::version).orElse(currentModel.localVersion()),
                         currentModel.remoteVersion()));
             } catch (IOException e) {
                 LOG.error("Failed to launch client", e);
-                applyLater(buildModel(LauncherState.ERROR, 
+                applyLater(buildModel(LauncherState.ERROR,
                         localization.get("launcher.button.retry"), true,
                         localization.get("launcher.status.launch_failed").replace("{0}", e.getMessage()),
                         currentModel.localVersion(), currentModel.remoteVersion()));
@@ -255,7 +257,7 @@ public class LauncherApplication extends Application {
     }
 
     private LauncherModel buildModel(LauncherState state, String actionLabel, boolean actionEnabled,
-                                     String message, String localVersion, String remoteVersion) {
+            String message, String localVersion, String remoteVersion) {
         return new LauncherModel(state, actionLabel, actionEnabled, message, localVersion, remoteVersion);
     }
 

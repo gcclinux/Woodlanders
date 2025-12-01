@@ -5,6 +5,7 @@
 /.vscode
 out/
 /gradlew
+/gradlew.bat
 /server.log
 *.class
 

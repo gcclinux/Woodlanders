@@ -64,7 +64,7 @@ task runApp(type: JavaExec) {
     group = 'application'
     description = 'Run the main Woodlanders application'
     dependsOn classes
-    classpath = sourceSets.main.runtimeClasspath
+    classpath = sourceSets.main.runtimeClasspath + files('assets')
     mainClass = 'wagemaker.uk.desktop.DesktopLauncher'
     workingDir = project.rootDir
 }

@@ -9,6 +9,7 @@ public class DesktopLauncher {
         Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
         config.setTitle("Woodlander");
         config.setWindowedMode(1920, 1080);
+        config.setWindowIcon("icon/icon.png");
         new Lwjgl3Application(new MyGdxGame(), config);
     }
 }

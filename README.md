@@ -14,6 +14,7 @@ This game was developed using a combination of cutting-edge AI tools, each contr
 - **Amazon Q** - AI assistant embedded in Kiro IDE and available as a VSCode extension, providing intelligent code suggestions and assistance
 - **GitHub Copilot** - Used within Visual Studio Code IDE for the Woodlanders launcher, leveraging autocomplete and multiple dedicated LLMs
 - **Microsoft Copilot & Google Gemini** - AI tools for generating and identifying imagery and object items on sprite sheets, helping create visual assets
+- **Antigravity** - The powerful agentic AI coding assistant, using the fast GPT‑OSS model for rapid code generation and iteration or autonomous code generation.
 
 ### The Vision: Zero-Code Game Development
 
