@@ -170,9 +170,9 @@ public class PlayerProfileMenuCharacterSelectionIntegrationTest {
         assertTrue(sourceCode.contains("characterSelectionDialog.open()"),
             "PlayerProfileMenu should call characterSelectionDialog.open()");
         
-        // Verify the selection is for index 1 (choose character)
-        assertTrue(sourceCode.contains("selectedIndex == 1"),
-            "PlayerProfileMenu should check for index 1 (choose character)");
+        // Verify the selection is for index 3 (choose character is at index 3 in current menu)
+        assertTrue(sourceCode.contains("selectedIndex == 3"),
+            "PlayerProfileMenu should check for index 3 (choose character)");
     }
     
     /**
@@ -320,11 +320,11 @@ public class PlayerProfileMenuCharacterSelectionIntegrationTest {
         assertTrue(sourceCode.contains("MENU_HEIGHT"),
             "PlayerProfileMenu should define MENU_HEIGHT");
         
-        // Verify it's at least 300 to accommodate 6 options (was 5 before)
+        // Verify it's at least 380 to accommodate 8 options
         // Each option takes about 35 pixels, plus title and padding
-        assertTrue(sourceCode.contains("MENU_HEIGHT = 310") || 
-                   sourceCode.contains("MENU_HEIGHT = 300") ||
-                   sourceCode.contains("MENU_HEIGHT = 320"),
+        assertTrue(sourceCode.contains("MENU_HEIGHT = 380") || 
+                   sourceCode.contains("MENU_HEIGHT = 390") ||
+                   sourceCode.contains("MENU_HEIGHT = 400"),
             "MENU_HEIGHT should be increased to accommodate new option");
     }
     
@@ -348,8 +348,8 @@ public class PlayerProfileMenuCharacterSelectionIntegrationTest {
         
         String sourceCode = content.toString();
         
-        // Verify Save Player disable logic uses index 2 (was 1 before)
-        assertTrue(sourceCode.contains("i == 2") && sourceCode.contains("FreeWorldManager.isFreeWorldActive()"),
-            "Save Player disable logic should check index 2 (after adding choose_character at index 1)");
+        // Verify Save Player disable logic uses index 4 (save_player is at index 4)
+        assertTrue(sourceCode.contains("i == 4") && sourceCode.contains("FreeWorldManager.isFreeWorldActive()"),
+            "Save Player disable logic should check index 4");
     }
 }

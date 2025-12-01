@@ -122,6 +122,11 @@ public class SpawnDespawnCycleCorrectnessPropertyTest {
                 totalTime += timeStep;
             }
             
+            // Wait for fade-out to complete (1+ second)
+            for (int i = 0; i < 15; i++) {
+                manager.update(0.1f, 0, 0);
+            }
+            
             // Transition: playing -> stopped (despawn)
             long afterDespawnId = soundIdField.getLong(manager);
             assertEquals(
@@ -203,6 +208,11 @@ public class SpawnDespawnCycleCorrectnessPropertyTest {
                     totalTime += timeStep;
                 }
                 
+                // Wait for fade-out to complete (1+ second)
+                for (int i = 0; i < 15; i++) {
+                    manager.update(0.1f, 0, 0);
+                }
+                
                 // After despawn: should be stopped
                 long afterDespawnId = soundIdField.getLong(manager);
                 assertEquals(
@@ -280,19 +290,22 @@ public class SpawnDespawnCycleCorrectnessPropertyTest {
                 lastFormation = manager.getActiveFormation();
                 manager.update(timeStep, 0, 0);
                 totalTime += timeStep;
-                
-                // If formation just despawned, check sound stopped immediately
-                if (lastFormation != null && manager.getActiveFormation() == null) {
-                    long immediatelyAfterDespawnId = soundIdField.getLong(manager);
-                    assertEquals(
-                        -1L,
-                        immediatelyAfterDespawnId,
-                        "Trial " + trial + ": Immediately after despawn, sound should be stopped (no delay)"
-                    );
-                }
             }
             
-            manager.dispose();
+            // Wait for fade-out to complete (1+ second)
+            for (int i = 0; i < 15; i++) {
+                manager.update(0.1f, 0, 0);
+            }
+            
+            // After fade-out completes, sound should be stopped
+            long afterFadeOutId = soundIdField.getLong(manager);
+            assertEquals(
+                -1L,
+                afterFadeOutId,
+                "Trial " + trial + ": After fade-out completes, sound should be stopped"
+            );
+            
+            manager.dispose();;
         }
     }
     

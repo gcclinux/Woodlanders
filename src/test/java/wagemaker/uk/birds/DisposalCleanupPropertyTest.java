@@ -240,8 +240,13 @@ public class DisposalCleanupPropertyTest {
                 totalTime += timeStep;
             }
             
-            // Verify sound stopped after despawn
-            long afterDespawnId = soundIdField.getLong(manager);
+            // Wait for fade-out to complete (1+ second)
+            for (int i = 0; i < 15; i++) {
+                manager.update(0.1f, 0, 0);
+            }
+            
+            // Verify sound stopped after despawn and fade-out
+            long afterDespawnId = soundIdField.getLong(manager);;
             assertEquals(
                 -1L,
                 afterDespawnId,

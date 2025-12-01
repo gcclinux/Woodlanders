@@ -154,6 +154,11 @@ public class SoundStateMatchesFormationStatePropertyTest {
                 totalTime += timeStep;
             }
             
+            // Wait for fade-out to complete (1+ second)
+            for (int i = 0; i < 15; i++) {
+                manager.update(0.1f, 0, 0);
+            }
+            
             // After despawn: no formation, no sound
             assertNull(
                 manager.getActiveFormation(),
@@ -249,6 +254,11 @@ public class SoundStateMatchesFormationStatePropertyTest {
                     totalTime += timeStep;
                 }
                 
+                // Wait for fade-out to complete (1+ second)
+                for (int i = 0; i < 15; i++) {
+                    manager.update(0.1f, 0, 0);
+                }
+                
                 // After despawn: verify invariant
                 BirdFormation afterDespawnFormation = manager.getActiveFormation();
                 long afterDespawnSoundId = soundIdField.getLong(manager);
@@ -299,30 +309,37 @@ public class SoundStateMatchesFormationStatePropertyTest {
             Field soundIdField = BirdFormationManager.class.getDeclaredField("birdSoundId");
             soundIdField.setAccessible(true);
             
+            Field isFadingOutField = BirdFormationManager.class.getDeclaredField("isFadingOut");
+            isFadingOutField.setAccessible(true);
+            
             // Perform many update steps and check invariant after each
             for (int step = 0; step < 200; step++) {
                 manager.update(0.1f, 0, 0);
                 
                 BirdFormation formation = manager.getActiveFormation();
                 long soundId = soundIdField.getLong(manager);
+                boolean isFadingOut = isFadingOutField.getBoolean(manager);
                 
                 // Check invariant: formation exists <=> sound playing
+                // Note: During fade-out, formation is null but sound is still playing (fading)
                 if (formation != null) {
                     assertNotEquals(
                         -1L,
                         soundId,
                         "Trial " + trial + ", Step " + step + ": When formation exists, sound must be playing"
                     );
-                } else {
+                } else if (!isFadingOut) {
+                    // Only check sound is stopped when not in fade-out state
                     assertEquals(
                         -1L,
                         soundId,
-                        "Trial " + trial + ", Step " + step + ": When formation is null, sound must not be playing"
+                        "Trial " + trial + ", Step " + step + ": When formation is null and not fading, sound must not be playing"
                     );
                 }
+                // During fade-out (formation null, isFadingOut true), sound may still be playing temporarily
             }
             
-            manager.dispose();
+            manager.dispose();;
         }
     }
 }

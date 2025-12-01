@@ -12,18 +12,18 @@ import static org.junit.jupiter.api.Assertions.*;
  * **Validates: Requirements 2.2, 2.3, 2.4, 2.5**
  * 
  * For any fall sequence, the animation should progress through all 5 frames 
- * (fall, standup1, standup2, standup3, standup4) with exactly 0.8 seconds 
+ * (fall, standup1, standup2, standup3, standup4) with exactly 0.2 seconds 
  * between each frame transition.
  */
 public class FallAnimationTimingPropertyTest {
     
-    private static final float FRAME_DURATION = 0.8f;
+    private static final float FRAME_DURATION = 0.2f;
     private static final float EPSILON = 0.001f; // Tolerance for floating point comparison
     
     /**
      * Property: Animation progresses through all states with correct timing.
      * 
-     * For any sequence of delta time values that sum to >= 4.0 seconds,
+     * For any sequence of delta time values that sum to >= 1.0 seconds,
      * the animation should progress through all 5 frames and reach COMPLETE state.
      */
     @Test
@@ -45,7 +45,7 @@ public class FallAnimationTimingPropertyTest {
             float deltaTime4 = 0.01f + random.nextFloat() * 0.09f;
             
             // Simulate time passing to complete all frames
-            // Each frame needs 0.8 seconds, so 5 frames = 4.0 seconds total
+            // Each frame needs 0.2 seconds, so 5 frames = 1.0 seconds total
             float totalTime = 0.0f;
             float dt = deltaTime1;
             
@@ -85,16 +85,16 @@ public class FallAnimationTimingPropertyTest {
             assertEquals(5, transitionCount,
                         "Animation should have 5 state transitions");
             
-            // Verify total time is approximately 4.0 seconds (5 frames * 0.8 seconds)
-            assertTrue(totalTime >= 4.0f && totalTime < 4.5f,
-                      "Animation should complete in approximately 4.0 seconds, was: " + totalTime);
+            // Verify total time is approximately 1.0 seconds (5 frames * 0.2 seconds)
+            assertTrue(totalTime >= 1.0f && totalTime < 1.5f,
+                      "Animation should complete in approximately 1.0 seconds, was: " + totalTime);
         }
     }
     
     /**
-     * Property: Each frame transition occurs at exactly 0.8 second intervals.
+     * Property: Each frame transition occurs at exactly 0.2 second intervals.
      * 
-     * For any animation sequence, when we update with exactly 0.8 seconds,
+     * For any animation sequence, when we update with exactly 0.2 seconds,
      * the state should advance by exactly one frame.
      */
     @Test
@@ -150,7 +150,7 @@ public class FallAnimationTimingPropertyTest {
             int updateCount = 0;
             
             // Run animation until complete (need enough iterations for small delta times)
-            // With dt=0.001, we need 4000 iterations to reach 4.0 seconds
+            // With dt=0.001, we need 1000 iterations to reach 1.0 seconds
             while (system.getCurrentState() != FallAnimationSystem.FallAnimationState.COMPLETE && updateCount < 5000) {
                 system.update(dt);
                 totalTime += dt;
@@ -162,9 +162,9 @@ public class FallAnimationTimingPropertyTest {
                          system.getCurrentState(),
                          "Animation should reach COMPLETE state");
             
-            // Verify total time is approximately 4.0 seconds (allowing for one extra frame of accumulation)
-            assertTrue(totalTime >= 4.0f && totalTime < 4.0f + dt + EPSILON,
-                      "Total time should be close to 4.0 seconds: " + totalTime);
+            // Verify total time is approximately 1.0 seconds (allowing for one extra frame of accumulation)
+            assertTrue(totalTime >= 1.0f && totalTime < 1.0f + dt + EPSILON,
+                      "Total time should be close to 1.0 seconds: " + totalTime);
         }
     }
     

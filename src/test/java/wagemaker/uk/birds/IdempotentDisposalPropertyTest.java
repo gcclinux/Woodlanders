@@ -275,8 +275,13 @@ public class IdempotentDisposalPropertyTest {
                 totalTime += timeStep;
             }
             
-            // Sound should have been stopped during despawn
-            verify(mockSound, times(1)).stop(mockSoundId);
+            // Wait for fade-out to complete (1+ second)
+            for (int i = 0; i < 15; i++) {
+                manager.update(0.1f, 0, 0);
+            }
+            
+            // Sound should have been stopped during fade-out
+            verify(mockSound, times(1)).stop(mockSoundId);;
             
             // Multiple dispose calls
             assertDoesNotThrow(

@@ -58,7 +58,7 @@ public class GridNavigationWrappingPropertyTest {
         for (int trial = 0; trial < 100; trial++) {
             // Generate random starting position
             int startColumn = random.nextInt(2);  // 0 or 1
-            int startRow = random.nextInt(2);     // 0 or 1
+            int startRow = random.nextInt(4);     // 0, 1, 2, or 3 (2x4 grid)
             
             // Generate random navigation direction
             Direction direction = Direction.values()[random.nextInt(Direction.values().length)];
@@ -97,10 +97,10 @@ public class GridNavigationWrappingPropertyTest {
             
             switch (direction) {
                 case UP:
-                    expectedRow = (startRow - 1 + 2) % 2;  // Wrap: 0->1, 1->0
+                    expectedRow = (startRow - 1 + 4) % 4;  // Wrap: 0->3, 1->0, 2->1, 3->2
                     break;
                 case DOWN:
-                    expectedRow = (startRow + 1) % 2;      // Wrap: 0->1, 1->0
+                    expectedRow = (startRow + 1) % 4;      // Wrap: 0->1, 1->2, 2->3, 3->0
                     break;
                 case LEFT:
                     expectedColumn = (startColumn - 1 + 2) % 2;  // Wrap: 0->1, 1->0
@@ -121,8 +121,8 @@ public class GridNavigationWrappingPropertyTest {
             // Verify position is still within bounds
             assertTrue(dialog.getSelectedColumn() >= 0 && dialog.getSelectedColumn() <= 1,
                      "Column should be in range [0,1] (trial " + trial + ")");
-            assertTrue(dialog.getSelectedRow() >= 0 && dialog.getSelectedRow() <= 1,
-                     "Row should be in range [0,1] (trial " + trial + ")");
+            assertTrue(dialog.getSelectedRow() >= 0 && dialog.getSelectedRow() <= 3,
+                     "Row should be in range [0,3] (trial " + trial + ")");
             
             // Clean up
             dialog.dispose();

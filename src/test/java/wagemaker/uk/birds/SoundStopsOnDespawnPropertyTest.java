@@ -122,6 +122,11 @@ public class SoundStopsOnDespawnPropertyTest {
                 "Trial " + trial + ": Formation should despawn"
             );
             
+            // Wait for fade-out to complete (1+ second)
+            for (int i = 0; i < 15; i++) {
+                manager.update(0.1f, 0, 0);
+            }
+            
             // Verify sound stopped: sound ID should be -1
             long afterDespawnSoundId = soundIdField.getLong(manager);
             assertEquals(
@@ -202,6 +207,11 @@ public class SoundStopsOnDespawnPropertyTest {
                     manager.getActiveFormation(),
                     "Trial " + trial + ", Cycle " + cycle + ": Formation should despawn"
                 );
+                
+                // Wait for fade-out to complete (1+ second)
+                for (int i = 0; i < 15; i++) {
+                    manager.update(0.1f, 0, 0);
+                }
                 
                 long afterDespawnId = soundIdField.getLong(manager);
                 assertEquals(

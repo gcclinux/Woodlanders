@@ -58,8 +58,8 @@ public class GameMenuControlsIntegrationTest {
         menuHeightField.setAccessible(true);
         float menuHeight = menuHeightField.getFloat(null);
         
-        assertEquals(340.0f, menuHeight, 0.01f, 
-            "MENU_HEIGHT should be 340 to accommodate all 9 menu items");
+        assertEquals(325.0f, menuHeight, 0.01f, 
+            "MENU_HEIGHT should be 325 to accommodate current menu items");
     }
     
     /**
@@ -89,23 +89,19 @@ public class GameMenuControlsIntegrationTest {
         int arrayEnd = sourceCode.indexOf("};", singleplayerStart);
         String arrayDefinition = sourceCode.substring(singleplayerStart, arrayEnd + 2);
         
-        // Verify that menu.controls is included
-        assertTrue(arrayDefinition.contains("menu.controls"), 
-            "singleplayerMenuItems should include menu.controls");
+        // Verify that menu.player_profile is included (controls are accessed through player profile menu)
+        assertTrue(arrayDefinition.contains("menu.player_profile"), 
+            "singleplayerMenuItems should include menu.player_profile");
         
-        // Verify the order: menu.player_location, menu.controls, menu.save_world
-        int playerLocationIndex = arrayDefinition.indexOf("menu.player_location");
-        int controlsIndex = arrayDefinition.indexOf("menu.controls");
+        // Verify the order: menu.player_profile, menu.save_world
+        int playerProfileIndex = arrayDefinition.indexOf("menu.player_profile");
         int saveWorldIndex = arrayDefinition.indexOf("menu.save_world");
         
-        assertTrue(playerLocationIndex > 0, "menu.player_location should exist");
-        assertTrue(controlsIndex > 0, "menu.controls should exist");
+        assertTrue(playerProfileIndex > 0, "menu.player_profile should exist");
         assertTrue(saveWorldIndex > 0, "menu.save_world should exist");
         
-        assertTrue(playerLocationIndex < controlsIndex, 
-            "menu.controls should come after menu.player_location");
-        assertTrue(controlsIndex < saveWorldIndex, 
-            "menu.controls should come before menu.save_world");
+        assertTrue(playerProfileIndex < saveWorldIndex, 
+            "menu.player_profile should come before menu.save_world");
     }
     
     /**
@@ -135,23 +131,19 @@ public class GameMenuControlsIntegrationTest {
         int arrayEnd = sourceCode.indexOf("};", multiplayerStart);
         String arrayDefinition = sourceCode.substring(multiplayerStart, arrayEnd + 2);
         
-        // Verify that menu.controls is included
-        assertTrue(arrayDefinition.contains("menu.controls"), 
-            "multiplayerMenuItems should include menu.controls");
+        // Verify that menu.player_profile is included (controls are accessed through player profile menu)
+        assertTrue(arrayDefinition.contains("menu.player_profile"), 
+            "multiplayerMenuItems should include menu.player_profile");
         
-        // Verify the order: menu.player_location, menu.controls, menu.save_world
-        int playerLocationIndex = arrayDefinition.indexOf("menu.player_location");
-        int controlsIndex = arrayDefinition.indexOf("menu.controls");
+        // Verify the order: menu.player_profile, menu.save_world
+        int playerProfileIndex = arrayDefinition.indexOf("menu.player_profile");
         int saveWorldIndex = arrayDefinition.indexOf("menu.save_world");
         
-        assertTrue(playerLocationIndex > 0, "menu.player_location should exist");
-        assertTrue(controlsIndex > 0, "menu.controls should exist");
+        assertTrue(playerProfileIndex > 0, "menu.player_profile should exist");
         assertTrue(saveWorldIndex > 0, "menu.save_world should exist");
         
-        assertTrue(playerLocationIndex < controlsIndex, 
-            "menu.controls should come after menu.player_location");
-        assertTrue(controlsIndex < saveWorldIndex, 
-            "menu.controls should come before menu.save_world");
+        assertTrue(playerProfileIndex < saveWorldIndex, 
+            "menu.player_profile should come before menu.save_world");
     }
     
     /**

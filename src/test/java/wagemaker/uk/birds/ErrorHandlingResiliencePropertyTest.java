@@ -172,6 +172,11 @@ public class ErrorHandlingResiliencePropertyTest {
                         manager.update(timeStep, 0, 0);
                         totalTime += timeStep;
                     }
+                    
+                    // Wait for fade-out to complete (1+ second)
+                    for (int i = 0; i < 15; i++) {
+                        manager.update(0.1f, 0, 0);
+                    }
                 },
                 "Trial " + trial + ": Despawn should not crash when sound.stop() throws exception"
             );
@@ -182,13 +187,13 @@ public class ErrorHandlingResiliencePropertyTest {
                 "Trial " + trial + ": Formation should despawn even when sound.stop() fails"
             );
             
-            // Verify sound ID reset to -1 despite error
+            // Verify sound ID reset to -1 despite error (reset happens in finally block)
             long afterDespawnId = soundIdField.getLong(manager);
             assertEquals(
                 -1L,
                 afterDespawnId,
                 "Trial " + trial + ": Sound ID should be reset to -1 even when sound.stop() fails"
-            );
+            );;
             
             manager.dispose();
         }

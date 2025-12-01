@@ -62,8 +62,8 @@ public class FallAnimationSpriteSheetPropertyTest {
                            "Frame " + i + " should have correct X coordinate");
                 assertEquals(expectedCoords[i][1], frame.getSpriteY(), 
                            "Frame " + i + " should have correct Y coordinate");
-                assertEquals(0.8f, frame.getDuration(), 0.001f,
-                           "Frame " + i + " should have 0.8 second duration");
+                assertEquals(0.2f, frame.getDuration(), 0.001f,
+                           "Frame " + i + " should have 0.2 second duration");
             }
         }
     }
