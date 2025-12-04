@@ -1543,6 +1543,7 @@ public class ClientConnection implements Runnable {
         playerState.setAppleCount(message.getAppleCount());
         playerState.setBananaCount(message.getBananaCount());
         playerState.setAppleSaplingCount(message.getAppleSaplingCount());
+        playerState.setBananaSaplingCount(message.getBananaSaplingCount());
         playerState.setBambooSaplingCount(message.getBambooSaplingCount());
         playerState.setBambooStackCount(message.getBambooStackCount());
         playerState.setTreeSaplingCount(message.getTreeSaplingCount());
@@ -1557,6 +1558,7 @@ public class ClientConnection implements Runnable {
                          ": Apples=" + message.getAppleCount() +
                          ", Bananas=" + message.getBananaCount() +
                          ", AppleSapling=" + message.getAppleSaplingCount() +
+                         ", BananaSapling=" + message.getBananaSaplingCount() +
                          ", BambooSapling=" + message.getBambooSaplingCount() +
                          ", BambooStack=" + message.getBambooStackCount() +
                          ", TreeSapling=" + message.getTreeSaplingCount() +

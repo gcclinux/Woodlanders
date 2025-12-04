@@ -70,13 +70,15 @@ All phases (1-8) have been successfully implemented.
 
 ## Item Types Granted (250 each)
 1. Apples
-2. Bananas
-3. Bamboo Sapling
-4. Bamboo Stacks
-5. Tree Saplings
-6. Wood Stacks
-7. Pebbles
-8. Palm Fiber
+2. Apple Saplings
+3. Bananas
+4. Banana Saplings
+5. Bamboo Saplings
+6. Bamboo Stacks
+7. Tree Saplings
+8. Wood Stacks
+9. Pebbles
+10. Palm Fiber
 
 ## Translations
 
