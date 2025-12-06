@@ -4,6 +4,7 @@
 /*.iml
 /.vscode
 out/
+bin/
 /gradlew
 /gradlew.bat
 /server.log
